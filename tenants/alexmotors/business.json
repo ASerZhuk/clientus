@@ -1,0 +1,256 @@
+{
+  "business_type": "auto",
+  "slug": "alexmotors",
+  "name": "Alex Motors",
+  "phone": "+7 961 062-22-11",
+  "address": "Волгоград, ул. Таращанцев, 68Г",
+  "map_url": "https://yandex.ru/maps/?text=Волгоград, ул. Таращанцев, 68Г",
+  "timezone": "Europe/Volgograd",
+  "currency": "RUB",
+  "accent": "#C2000B",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Трансмиссия Powershift"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Программирование ключей"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Клапан EGR"
+    },
+    {
+      "key": "work-4",
+      "image": "work-4.jpg",
+      "caption": "Приборная панель и одометр"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 60,
+    "lead_time_min": 120,
+    "max_advance_days": 45,
+    "cancel_before_hours": 12,
+    "reminder_hours": 24
+  },
+  "exceptions": [],
+  "tagline": "Чип-тюнинг, развал-схождение, автоэлектрика и детейлинг",
+  "description": "Автосервис в Волгограде: чип-тюнинг и ремонт электроники, развал-схождение, кондиционеры, антикор и тонировка. Запишитесь онлайн — выберите услугу и удобное время.",
+  "info_cards": [
+    {
+      "title": "{services}",
+      "text": "{services_word:услуга|услуги|услуг} в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "{resources}",
+      "text": "{resources_word:рабочее место|рабочих места|рабочих мест}",
+      "icon": "images"
+    },
+    {
+      "title": "от {min_price}",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "09:00",
+      "19:00"
+    ],
+    "tue": [
+      "09:00",
+      "19:00"
+    ],
+    "wed": [
+      "09:00",
+      "19:00"
+    ],
+    "thu": [
+      "09:00",
+      "19:00"
+    ],
+    "fri": [
+      "09:00",
+      "19:00"
+    ],
+    "sat": [
+      "10:00",
+      "16:00"
+    ],
+    "sun": null
+  },
+  "resources": [
+    {
+      "key": "place-1",
+      "name": "Место 1"
+    },
+    {
+      "key": "place-2",
+      "name": "Место 2"
+    }
+  ],
+  "services": [
+    {
+      "key": "alignment",
+      "name": "Развал-схождение",
+      "description": "Регулировка углов установки колёс на стенде.",
+      "price": 1500,
+      "duration_min": 60,
+      "buffer_min": 15,
+      "keywords": [
+        "развал",
+        "схождение"
+      ]
+    },
+    {
+      "key": "chip",
+      "name": "Чип-тюнинг",
+      "description": "Настройка прошивки блока управления двигателем.",
+      "price": 8000,
+      "duration_min": 180,
+      "buffer_min": 15,
+      "keywords": [
+        "чип",
+        "тюнинг",
+        "прошивка"
+      ]
+    },
+    {
+      "key": "ac",
+      "name": "Заправка кондиционера",
+      "description": "Проверка системы и заправка хладагентом.",
+      "price": 2000,
+      "duration_min": 60,
+      "buffer_min": 15,
+      "keywords": [
+        "кондиционер",
+        "заправка"
+      ]
+    },
+    {
+      "key": "anticor",
+      "name": "Антикоррозийная обработка",
+      "description": "Обработка днища и скрытых полостей.",
+      "price": 12000,
+      "duration_min": 480,
+      "buffer_min": 30,
+      "keywords": [
+        "антикор"
+      ]
+    },
+    {
+      "key": "catalyst",
+      "name": "Удаление катализатора",
+      "description": "Удаление катализатора с программным отключением.",
+      "price": 7000,
+      "duration_min": 180,
+      "buffer_min": 15,
+      "keywords": [
+        "катализатор"
+      ]
+    },
+    {
+      "key": "pdr",
+      "name": "Удаление вмятин без покраски",
+      "description": "PDR: вмятины без покраски и шпатлёвки.",
+      "price": 3000,
+      "duration_min": 120,
+      "buffer_min": 15,
+      "keywords": [
+        "вмятины",
+        "pdr"
+      ]
+    },
+    {
+      "key": "tint",
+      "name": "Тонировка и бронирование",
+      "description": "Тонировка стёкол и бронеплёнка.",
+      "price": 5000,
+      "duration_min": 240,
+      "buffer_min": 15,
+      "keywords": [
+        "тонировка",
+        "бронирование"
+      ]
+    },
+    {
+      "key": "alarm",
+      "name": "Установка сигнализации StarLine",
+      "description": "Установка и настройка охранного комплекса.",
+      "price": 15000,
+      "duration_min": 300,
+      "buffer_min": 15,
+      "keywords": [
+        "сигнализация",
+        "starline"
+      ]
+    },
+    {
+      "key": "ecu",
+      "name": "Восстановление блоков управления",
+      "description": "Диагностика и ремонт ЭБУ.",
+      "price": 5000,
+      "duration_min": 120,
+      "buffer_min": 15,
+      "keywords": [
+        "эбу",
+        "блок"
+      ]
+    },
+    {
+      "key": "adblue",
+      "name": "Отключение AdBlue",
+      "description": "Программное отключение системы AdBlue.",
+      "price": 10000,
+      "duration_min": 180,
+      "buffer_min": 15,
+      "keywords": [
+        "adblue"
+      ]
+    },
+    {
+      "key": "keys",
+      "name": "Программирование ключей",
+      "description": "Привязка и изготовление ключей.",
+      "price": 3000,
+      "duration_min": 60,
+      "buffer_min": 15,
+      "keywords": [
+        "ключ"
+      ]
+    },
+    {
+      "key": "radio",
+      "name": "Раскодировка и ремонт магнитол",
+      "description": "Раскодировка и ремонт штатных магнитол.",
+      "price": 1500,
+      "duration_min": 60,
+      "buffer_min": 15,
+      "keywords": [
+        "магнитола"
+      ]
+    },
+    {
+      "key": "powershift",
+      "name": "Ремонт АКПП Powershift",
+      "description": "Диагностика и ремонт роботизированной коробки.",
+      "price": 15000,
+      "duration_min": 480,
+      "buffer_min": 30,
+      "keywords": [
+        "powershift",
+        "акпп",
+        "коробка"
+      ]
+    }
+  ]
+}

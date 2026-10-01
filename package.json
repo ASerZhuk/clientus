@@ -1,0 +1,32 @@
+{
+  "name": "clientus",
+  "private": true,
+  "packageManager": "pnpm@11.1.2",
+  "scripts": {
+    "tenant:new": "sh scripts/py.sh tenant:new",
+    "tenant:validate": "sh scripts/py.sh tenant:validate",
+    "tenant:publish": "sh scripts/py.sh tenant:publish",
+    "tenant:verify": "sh scripts/py.sh tenant:verify",
+    "owner:create": "sh scripts/py.sh owner:create",
+    "db:migrate": "sh scripts/py.sh db:migrate",
+    "db:seed": "sh scripts/py.sh db:seed",
+    "vapid:generate": "sh scripts/py.sh vapid:generate",
+    "dev:api": "cd api && .venv/bin/uvicorn app.main:app --reload --port 8000",
+    "dev:web": "pnpm --dir web dev",
+    "worker": "cd api && .venv/bin/python -m app.worker",
+    "build": "pnpm --dir web build",
+    "test:api": "cd api && .venv/bin/python -m pytest -q",
+    "test:web": "pnpm --dir web test",
+    "test:e2e": "pnpm --dir web test:e2e",
+    "admin:create": "sh scripts/py.sh admin:create",
+    "domain:add": "sh scripts/py.sh domain:add",
+    "domain:list": "sh scripts/py.sh domain:list",
+    "domain:verify": "sh scripts/py.sh domain:verify",
+    "domain:remove": "sh scripts/py.sh domain:remove",
+    "plan:set": "sh scripts/py.sh plan:set",
+    "tenant:list": "sh scripts/py.sh tenant:list",
+    "tenant:sample": "sh scripts/py.sh tenant:sample",
+    "tenant:handover": "sh scripts/py.sh tenant:handover",
+    "tenant:export": "sh scripts/py.sh tenant:export"
+  }
+}

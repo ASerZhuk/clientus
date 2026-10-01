@@ -1,0 +1,135 @@
+{
+  "plan": "standard",
+  "slug": "demo-tenant",
+  "name": "Мотор-Сервис 24",
+  "tagline": "Автосервис: ТО, диагностика, шиномонтаж",
+  "description": "Небольшой автосервис у метро. Работаем без выходных, запись по свободным окнам.",
+  "phone": "+7 343 000-33-44",
+  "address": "Екатеринбург, ул. Заводская, 5",
+  "map_url": "",
+  "timezone": "Asia/Yekaterinburg",
+  "currency": "RUB",
+  "accent": "#FF7A45",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "info_cards": [
+    {
+      "title": "3",
+      "text": "услуги в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "2",
+      "text": "подъёмника в работе",
+      "icon": "images"
+    },
+    {
+      "title": "от 1 500 ₽",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Замена ГРМ"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Шиномонтаж R19"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Диагностика подвески"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 60,
+    "max_advance_days": 45,
+    "cancel_before_hours": 6,
+    "reminder_hours": 12
+  },
+  "hours": {
+    "mon": [
+      "08:00",
+      "21:00"
+    ],
+    "tue": [
+      "08:00",
+      "21:00"
+    ],
+    "wed": [
+      "08:00",
+      "21:00"
+    ],
+    "thu": [
+      "08:00",
+      "21:00"
+    ],
+    "fri": [
+      "08:00",
+      "21:00"
+    ],
+    "sat": [
+      "08:00",
+      "21:00"
+    ],
+    "sun": [
+      "08:00",
+      "21:00"
+    ]
+  },
+  "exceptions": [],
+  "resources": [
+    {
+      "key": "lift-1",
+      "name": "Подъёмник 1"
+    },
+    {
+      "key": "lift-2",
+      "name": "Подъёмник 2"
+    }
+  ],
+  "services": [
+    {
+      "key": "oil",
+      "name": "Замена масла",
+      "description": "Масло и фильтр, сброс межсервисного интервала.",
+      "price": 2200,
+      "duration_min": 60,
+      "buffer_min": 15,
+      "keywords": [
+        "масло"
+      ]
+    },
+    {
+      "key": "diag",
+      "name": "Компьютерная диагностика",
+      "description": "Считывание ошибок и проверка систем.",
+      "price": 1500,
+      "duration_min": 45,
+      "buffer_min": 15,
+      "keywords": [
+        "диагностика"
+      ]
+    },
+    {
+      "key": "tires",
+      "name": "Шиномонтаж",
+      "description": "Снятие, балансировка и установка колёс.",
+      "price": 3200,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "шиномонтаж",
+        "колеса"
+      ]
+    }
+  ]
+}

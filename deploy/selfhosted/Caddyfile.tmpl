@@ -1,0 +1,26 @@
+# One studio on its own domain. HTTPS is automatic.
+@DOMAIN@ {
+	encode zstd gzip
+
+	# internal endpoints and the (disabled) operator API are never public
+	@blocked path /api/internal/* /api/admin/* /admin /admin/*
+	respond @blocked 404
+
+	@api path /api/*
+	reverse_proxy @api 127.0.0.1:8000 {
+		header_up X-Forwarded-Host {host}
+	}
+	reverse_proxy 127.0.0.1:3000 {
+		header_up Host {host}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		-Server
+	}
+	request_body {
+		max_size 12MB
+	}
+}

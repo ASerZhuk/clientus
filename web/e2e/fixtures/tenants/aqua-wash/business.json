@@ -1,0 +1,140 @@
+{
+  "business_type": "wash",
+  "plan": "domain",
+  "slug": "aqua-wash",
+  "name": "АкваДрайв",
+  "phone": "+7 812 000-22-33",
+  "address": "Санкт-Петербург, Индустриальный пр., 40",
+  "map_url": "",
+  "timezone": "Europe/Moscow",
+  "currency": "RUB",
+  "accent": "#22C3E6",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Работа 1"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Работа 2"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Работа 3"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 30,
+    "cancel_before_hours": 2,
+    "reminder_hours": 2,
+    "max_advance_days": 60
+  },
+  "exceptions": [],
+  "tagline": "Быстрая мойка без очереди",
+  "description": "Записывайтесь на удобное время — бокс будет свободен.",
+  "info_cards": [
+    {
+      "title": "3",
+      "text": "услуги в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "3",
+      "text": "бокса в работе",
+      "icon": "images"
+    },
+    {
+      "title": "от 700 ₽",
+      "text": "за мойку",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "08:00",
+      "22:00"
+    ],
+    "tue": [
+      "08:00",
+      "22:00"
+    ],
+    "wed": [
+      "08:00",
+      "22:00"
+    ],
+    "thu": [
+      "08:00",
+      "22:00"
+    ],
+    "fri": [
+      "08:00",
+      "22:00"
+    ],
+    "sat": [
+      "08:00",
+      "22:00"
+    ],
+    "sun": [
+      "08:00",
+      "22:00"
+    ]
+  },
+  "resources": [
+    {
+      "key": "box-1",
+      "name": "Бокс 1"
+    },
+    {
+      "key": "box-2",
+      "name": "Бокс 2"
+    },
+    {
+      "key": "box-3",
+      "name": "Бокс 3"
+    }
+  ],
+  "services": [
+    {
+      "key": "express",
+      "name": "Экспресс-мойка",
+      "description": "Кузов, стёкла, коврики.",
+      "price": 700,
+      "duration_min": 30,
+      "buffer_min": 10,
+      "keywords": [
+        "экспресс",
+        "мойка"
+      ]
+    },
+    {
+      "key": "complex",
+      "name": "Комплексная мойка",
+      "description": "Кузов, салон, порог, чернение резины.",
+      "price": 1500,
+      "duration_min": 60,
+      "buffer_min": 10,
+      "keywords": [
+        "комплексная"
+      ]
+    },
+    {
+      "key": "interior",
+      "name": "Химчистка салона",
+      "description": "Глубокая чистка тканей и пластика.",
+      "price": 6000,
+      "duration_min": 240,
+      "buffer_min": 15,
+      "keywords": [
+        "химчистка"
+      ]
+    }
+  ]
+}

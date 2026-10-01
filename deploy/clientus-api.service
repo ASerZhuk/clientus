@@ -1,0 +1,20 @@
+# /etc/systemd/system/clientus-api.service
+[Unit]
+Description=Clientus API (FastAPI)
+After=network.target
+
+[Service]
+User=clientus
+WorkingDirectory=/srv/clientus/api
+EnvironmentFile=/srv/clientus/.env
+# 2 workers are safe: every write is BEGIN IMMEDIATE + a UNIQUE index on occupancy cells
+ExecStart=/srv/clientus/api/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/clientus/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

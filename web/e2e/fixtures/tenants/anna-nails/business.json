@@ -1,0 +1,131 @@
+{
+  "business_type": "beauty_master",
+  "plan": "standard",
+  "slug": "anna-nails",
+  "name": "Анна · маникюр",
+  "phone": "+7 926 000-11-22",
+  "address": "Москва, ул. Тверская, 20, кв. 15",
+  "map_url": "",
+  "timezone": "Europe/Moscow",
+  "currency": "RUB",
+  "accent": "#E58BB5",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Работа 1"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Работа 2"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Работа 3"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 120,
+    "cancel_before_hours": 12,
+    "reminder_hours": 24,
+    "max_advance_days": 60
+  },
+  "exceptions": [],
+  "tagline": "Маникюр и уход за руками",
+  "description": "Работаю по записи, стерильные инструменты, аккуратный результат.",
+  "info_cards": [
+    {
+      "title": "5",
+      "text": "лет опыта",
+      "icon": "sparkle"
+    },
+    {
+      "title": "3",
+      "text": "услуги в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "от 1 800 ₽",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "09:00",
+      "19:00"
+    ],
+    "tue": [
+      "09:00",
+      "19:00"
+    ],
+    "wed": [
+      "09:00",
+      "19:00"
+    ],
+    "thu": [
+      "09:00",
+      "19:00"
+    ],
+    "fri": [
+      "09:00",
+      "19:00"
+    ],
+    "sat": [
+      "10:00",
+      "16:00"
+    ],
+    "sun": null
+  },
+  "resources": [
+    {
+      "key": "me",
+      "name": "Анна",
+      "description": "Мастер маникюра и педикюра",
+      "photo": "me.jpg"
+    }
+  ],
+  "services": [
+    {
+      "key": "manicure",
+      "name": "Маникюр",
+      "description": "Классический или аппаратный.",
+      "price": 1800,
+      "duration_min": 90,
+      "buffer_min": 15,
+      "keywords": [
+        "маникюр"
+      ]
+    },
+    {
+      "key": "gel",
+      "name": "Маникюр с покрытием",
+      "description": "Гель-лак, стойкость до 3 недель.",
+      "price": 2500,
+      "duration_min": 120,
+      "buffer_min": 15,
+      "keywords": [
+        "гель",
+        "покрытие"
+      ]
+    },
+    {
+      "key": "pedicure",
+      "name": "Педикюр",
+      "description": "Аппаратный педикюр.",
+      "price": 3000,
+      "duration_min": 120,
+      "buffer_min": 15,
+      "keywords": [
+        "педикюр"
+      ]
+    }
+  ]
+}

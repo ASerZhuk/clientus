@@ -1,0 +1,13 @@
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.1
+alembic==1.20.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+argon2-cffi==25.1.0
+pywebpush==2.5.0
+pillow==12.3.0
+python-multipart==0.0.32
+tzdata==2026.4
+email-validator==2.3.0
+httpx==0.28.1

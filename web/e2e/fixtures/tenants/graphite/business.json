@@ -1,0 +1,194 @@
+{
+  "plan": "domain",
+  "slug": "graphite",
+  "name": "GRAPHITE Detailing",
+  "tagline": "Детейлинг, который возвращает кузову глубину, а салону — чистоту",
+  "description": "Студия премиального ухода за автомобилем. Работаем на двух постах, к каждой машине — персональный мастер и фотоотчёт.",
+  "phone": "+7 495 000-11-22",
+  "address": "Москва, ул. Промышленная, 12, стр. 3",
+  "map_url": "https://yandex.ru/maps/?text=Москва, ул. Промышленная, 12",
+  "timezone": "Europe/Moscow",
+  "currency": "RUB",
+  "accent": "#4690FF",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "info_cards": [
+    {
+      "title": "5",
+      "text": "услуг в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "3",
+      "text": "поста в работе",
+      "icon": "images"
+    },
+    {
+      "title": "от 3 500 ₽",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Детали кузова"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Капот и оптика — пример"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Общий вид — пример"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 60,
+    "lead_time_min": 120,
+    "max_advance_days": 60,
+    "cancel_before_hours": 24,
+    "reminder_hours": 24
+  },
+  "hours": {
+    "mon": [
+      "09:00",
+      "20:00"
+    ],
+    "tue": [
+      "09:00",
+      "20:00"
+    ],
+    "wed": [
+      "09:00",
+      "20:00"
+    ],
+    "thu": [
+      "09:00",
+      "20:00"
+    ],
+    "fri": [
+      "09:00",
+      "20:00"
+    ],
+    "sat": [
+      "10:00",
+      "18:00"
+    ],
+    "sun": null
+  },
+  "exceptions": [
+    {
+      "date": "2026-11-04",
+      "closed": true,
+      "note": "День народного единства"
+    },
+    {
+      "date": "2026-12-31",
+      "closed": false,
+      "open": "10:00",
+      "close": "15:00",
+      "note": "Сокращённый день"
+    }
+  ],
+  "resources": [
+    {
+      "key": "bay-1",
+      "name": "Пост 1"
+    },
+    {
+      "key": "bay-2",
+      "name": "Пост 2"
+    },
+    {
+      "key": "ceramic-box",
+      "name": "Бокс керамики"
+    }
+  ],
+  "services": [
+    {
+      "key": "wash",
+      "name": "Премиум мойка",
+      "description": "Бесконтактная мойка, очистка дисков и порогов, сушка.",
+      "price": 3500,
+      "duration_min": 120,
+      "buffer_min": 30,
+      "resources": [
+        "bay-1",
+        "bay-2"
+      ],
+      "keywords": [
+        "мойка",
+        "помыть"
+      ]
+    },
+    {
+      "key": "interior",
+      "name": "Химчистка салона",
+      "description": "Глубокая чистка сидений, потолка и пластика.",
+      "price": 9000,
+      "duration_min": 300,
+      "buffer_min": 30,
+      "resources": [
+        "bay-1",
+        "bay-2"
+      ],
+      "keywords": [
+        "химчистка",
+        "салон"
+      ]
+    },
+    {
+      "key": "polish",
+      "name": "Полировка кузова",
+      "description": "Двухэтапная полировка, удаление царапин и голограмм.",
+      "price": 18000,
+      "duration_min": 480,
+      "buffer_min": 60,
+      "resources": [
+        "bay-1",
+        "bay-2"
+      ],
+      "keywords": [
+        "полировка кузова",
+        "царапины"
+      ]
+    },
+    {
+      "key": "headlights",
+      "name": "Полировка фар",
+      "description": "Восстановление прозрачности и защитное покрытие.",
+      "price": 3500,
+      "duration_min": 90,
+      "buffer_min": 15,
+      "resources": [
+        "bay-1",
+        "bay-2"
+      ],
+      "keywords": [
+        "фары",
+        "фар"
+      ]
+    },
+    {
+      "key": "ceramic",
+      "name": "Керамическое покрытие",
+      "description": "Подготовка, полировка и нанесение керамики. Автомобиль остаётся в боксе два дня.",
+      "price": 55000,
+      "duration_min": 2880,
+      "buffer_min": 60,
+      "resources": [
+        "ceramic-box"
+      ],
+      "keywords": [
+        "керамика",
+        "керамическое покрытие"
+      ]
+    }
+  ]
+}

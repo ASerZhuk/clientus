@@ -1,0 +1,252 @@
+{
+  "business_type": "beauty_studio",
+  "plan": "domain",
+  "slug": "loft-beauty",
+  "name": "Loft Beauty",
+  "phone": "+7 495 000-77-88",
+  "address": "Москва, Малая Бронная, 8",
+  "map_url": "",
+  "timezone": "Europe/Moscow",
+  "currency": "RUB",
+  "accent": "#C79BFF",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Работа 1"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Работа 2"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Работа 3"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 120,
+    "cancel_before_hours": 12,
+    "reminder_hours": 24,
+    "max_advance_days": 60
+  },
+  "exceptions": [],
+  "tagline": "Салон красоты: волосы, ногти, уход",
+  "description": "Мастера с опытом, запись к конкретному специалисту.",
+  "info_cards": [
+    {
+      "title": "3",
+      "text": "мастера принимают",
+      "icon": "user"
+    },
+    {
+      "title": "4",
+      "text": "услуги в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "от 1 800 ₽",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "10:00",
+      "20:00"
+    ],
+    "tue": [
+      "10:00",
+      "20:00"
+    ],
+    "wed": [
+      "10:00",
+      "20:00"
+    ],
+    "thu": [
+      "10:00",
+      "20:00"
+    ],
+    "fri": [
+      "10:00",
+      "20:00"
+    ],
+    "sat": [
+      "10:00",
+      "20:00"
+    ],
+    "sun": null
+  },
+  "resources": [
+    {
+      "key": "anna",
+      "name": "Анна",
+      "description": "Стилист-парикмахер",
+      "hours": {
+        "mon": [
+          "10:00",
+          "19:00"
+        ],
+        "tue": [
+          "10:00",
+          "19:00"
+        ],
+        "wed": [
+          "10:00",
+          "19:00"
+        ],
+        "thu": [
+          "10:00",
+          "19:00"
+        ],
+        "fri": [
+          "10:00",
+          "19:00"
+        ],
+        "sat": null,
+        "sun": null
+      },
+      "photo": "anna.jpg"
+    },
+    {
+      "key": "olga",
+      "name": "Ольга",
+      "description": "Мастер маникюра",
+      "hours": {
+        "wed": [
+          "12:00",
+          "20:00"
+        ],
+        "thu": [
+          "12:00",
+          "20:00"
+        ],
+        "fri": [
+          "12:00",
+          "20:00"
+        ],
+        "sat": [
+          "12:00",
+          "20:00"
+        ],
+        "mon": null,
+        "tue": null,
+        "sun": null
+      },
+      "photo": "olga.jpg"
+    },
+    {
+      "key": "maria",
+      "name": "Мария",
+      "description": "Стилист-парикмахер, помощник Анны",
+      "photo": "maria.jpg",
+      "hours": {
+        "mon": null,
+        "tue": [
+          "10:00",
+          "19:00"
+        ],
+        "wed": [
+          "10:00",
+          "19:00"
+        ],
+        "thu": [
+          "10:00",
+          "19:00"
+        ],
+        "fri": [
+          "10:00",
+          "19:00"
+        ],
+        "sat": [
+          "10:00",
+          "18:00"
+        ],
+        "sun": null
+      },
+      "exceptions": [
+        {
+          "date": "2026-10-05",
+          "closed": true,
+          "note": "отпуск"
+        },
+        {
+          "date": "2026-10-06",
+          "closed": true,
+          "note": "отпуск"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "key": "cut",
+      "name": "Стрижка",
+      "description": "Женская стрижка с укладкой.",
+      "price": 2500,
+      "duration_min": 60,
+      "buffer_min": 10,
+      "resources": [
+        "anna",
+        {
+          "key": "maria",
+          "price": 1800,
+          "duration_min": 75
+        }
+      ],
+      "keywords": [
+        "стрижка"
+      ]
+    },
+    {
+      "key": "color",
+      "name": "Окрашивание",
+      "description": "Однотонное окрашивание.",
+      "price": 6000,
+      "duration_min": 180,
+      "buffer_min": 15,
+      "resources": [
+        "anna"
+      ],
+      "keywords": [
+        "окрашивание",
+        "покраска"
+      ]
+    },
+    {
+      "key": "manicure",
+      "name": "Маникюр",
+      "description": "Классический или аппаратный.",
+      "price": 1800,
+      "duration_min": 90,
+      "buffer_min": 15,
+      "resources": [
+        "olga"
+      ],
+      "keywords": [
+        "маникюр"
+      ]
+    },
+    {
+      "key": "gel",
+      "name": "Маникюр с покрытием",
+      "description": "Гель-лак.",
+      "price": 2500,
+      "duration_min": 120,
+      "buffer_min": 15,
+      "resources": [
+        "olga"
+      ],
+      "keywords": [
+        "гель"
+      ]
+    }
+  ]
+}
