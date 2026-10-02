@@ -1,5 +1,6 @@
 "use client";
 
+import { AppPrompt } from "@/components/AppPrompt";
 import { UserCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { createContext, useCallback, useContext, useState } from "react";
@@ -50,6 +51,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
         </div>
         <BottomNav onAssistant={() => open()} />
         <AssistantSheet slug={slug} audience="client" autoAsk={seed} isOpen={assistantOpen} onClose={() => setAssistantOpen(false)} />
+        {!tenant.is_preview && <AppPrompt audience="client" />}
       </BookingProvider>
     </AssistantCtx.Provider>
   );

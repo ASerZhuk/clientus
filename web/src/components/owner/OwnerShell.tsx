@@ -9,6 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useState } from "react";
 import { AssistantSheet } from "@/components/client/AssistantSheet";
+import { AppPrompt } from "@/components/AppPrompt";
 import { useStudio } from "@/components/StudioProviders";
 import { Input } from "@/components/ui/Input";
 import { api, ApiError, ownerApi, setCsrf } from "@/lib/api";
@@ -131,6 +132,7 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
       <AssistantSheet slug={slug} audience="owner" isOpen={assistant} onClose={() => setAssistant(false)} />
+      <AppPrompt audience="owner" />
     </OwnerCtx.Provider>
   );
 }
