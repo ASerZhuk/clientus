@@ -63,7 +63,8 @@ export function AssistantSheet({ slug, audience, isOpen, onClose, autoAsk }: Pro
     ask.mutate({ text: t, context, history: messages.slice(-6).map((m) => ({ role: m.role, text: m.text.slice(0, 1500) })) });
   };
 
-  useEffect(() => { endRef.current?.scrollIntoView({ block: "end" }); }, [messages, ask.isPending]); // newer browsers return a Promise here; an effect must not return it
+  // scroll only the feed: scrollIntoView would also scroll the sheet and push the header out of view
+  useEffect(() => { const feed = endRef.current?.parentElement; if (feed) feed.scrollTop = feed.scrollHeight; }, [messages, ask.isPending]);
   const asked = useRef(false);
   useEffect(() => {
     if (!isOpen) asked.current = false;

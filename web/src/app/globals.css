@@ -209,8 +209,8 @@
   /* ---------- chat ---------- */
   .chat { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
   /* assistant as a messenger: header, feed growing from the bottom, quick replies, composer at the very bottom */
-  .chat-shell { display: flex; flex-direction: column; height: 100%; min-height: 70dvh; width: 100%; max-width: var(--page-max); margin-inline: auto; }
-  .chat-head { display: flex; align-items: center; gap: 12px; padding: 4px var(--page-gutter) 12px; border-bottom: 1px solid var(--line); }
+  .chat-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: var(--page-max); margin-inline: auto; }
+  .chat-head { display: flex; align-items: center; gap: 12px; padding: 14px var(--page-gutter) 12px; border-bottom: 1px solid var(--line); }
   .chat-head b { display: block; font-size: 16px; }
   .chat-head small { display: block; color: var(--muted); font-size: 13px; }
   .chat-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--cream, #ede4d3); color: var(--on-cream, #1b1b1b); font-size: 20px; }
