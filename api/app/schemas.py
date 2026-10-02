@@ -44,7 +44,6 @@ class LoginIn(Strict):
 
 
 class PasswordChangeIn(Strict):
-    current: str = Field(min_length=1, max_length=200)
     new: str = Field(min_length=10, max_length=200)  # same minimum as owner:create
 
 

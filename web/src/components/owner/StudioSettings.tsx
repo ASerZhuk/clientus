@@ -346,25 +346,23 @@ export function StudioSettings() {
 
 function PasswordChange() {
   const { slug } = useStudio();
-  const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [repeat, setRepeat] = useState("");
   const mismatch = repeat.length > 0 && repeat !== next;
   const short = next.length > 0 && next.length < 10;
   const save = useMutation({
-    mutationFn: () => api(`${ownerApi(slug)}/password`, { method: "POST", body: { current, new: next } }),
-    onSuccess: () => { setCurrent(""); setNext(""); setRepeat(""); },
+    mutationFn: () => api(`${ownerApi(slug)}/password`, { method: "POST", body: { new: next } }),
+    onSuccess: () => { setNext(""); setRepeat(""); },
   });
   return (
     <div className="panel stack">
       <h2 className="section-title" style={{ margin: 0 }}>Пароль</h2>
-      <Input label="Текущий пароль" type="password" autoComplete="current-password" value={current} onChange={setCurrent} />
       <Input label="Новый пароль" type="password" autoComplete="new-password" value={next} onChange={setNext} error={short ? "Минимум 10 символов" : undefined} />
       <Input label="Повторите новый пароль" type="password" autoComplete="new-password" value={repeat} onChange={setRepeat} error={mismatch ? "Пароли не совпадают" : undefined} />
       <span className="muted" style={{ fontSize: 13 }}>На других устройствах кабинет попросит войти заново.</span>
       {save.isError && <span className="error-text" role="alert">{save.error instanceof ApiError ? save.error.message : "Не удалось сменить пароль."}</span>}
       {save.isSuccess && <span style={{ color: "#3ddc84", fontSize: 14 }} role="status">Пароль изменён</span>}
-      <Button label="Сменить пароль" variant="primary" isDisabled={!current || next.length < 10 || next !== repeat} isLoading={save.isPending} onClick={() => save.mutate()} />
+      <Button label="Сменить пароль" variant="primary" isDisabled={next.length < 10 || next !== repeat} isLoading={save.isPending} onClick={() => save.mutate()} />
     </div>
   );
 }

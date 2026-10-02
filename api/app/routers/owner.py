@@ -102,12 +102,12 @@ def logout(request: Request, response: Response, ctx: OwnerCtx = Depends(owner_d
 
 @router.post("/password", status_code=204)
 def change_password(body: PasswordChangeIn, request: Request, ctx: OwnerCtx = Depends(owner_dep)) -> None:
-    """Needs the current password; every other session of this owner is signed out."""
+    """The signed-in owner sets a new password; every other session of this owner is signed out."""
     limit_request(request, ctx.tenant.id, "password", 5, 600)
     with database.write_session() as db:
         user = db.get(User, ctx.user_id)
-        if not user or not verify_password(body.current, user.password_hash):
-            raise HTTPException(400, {"code": "wrong_password"})
+        if not user:
+            raise HTTPException(401, {"code": "not_authenticated"})
         user.password_hash = hash_password(body.new)
         keep = sha256_hex(request.cookies.get(SESSION_COOKIE, ""))
         db.execute(delete(OwnerSession).where(OwnerSession.user_id == user.id, OwnerSession.token_hash != keep))
