@@ -329,6 +329,7 @@
   .adm-sub { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
   .adm-detail { position: sticky; top: 20px; max-height: calc(100dvh - 40px); overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
   .adm-detail-title { margin: 0; font-size: 20px; font-weight: 700; }
+  .adm-count { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; margin-left: 6px; border-radius: 999px; background: var(--cream, #efe5d3); color: #17130d; font-size: 13px; vertical-align: 3px; }
   .adm-detail .panel { border-radius: 12px; padding: 14px; background: var(--tile); }
   .adm-empty { display: grid; place-items: center; min-height: 280px; color: var(--muted); text-align: center; font-size: 14px; }
   @media (prefers-reduced-motion: reduce) { .adm-table tbody tr { transition: none; } }

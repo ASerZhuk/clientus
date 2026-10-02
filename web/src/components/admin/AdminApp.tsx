@@ -160,6 +160,47 @@ function TenantPanel({ slug, plans, onClose }: { slug: string | null; plans: Adm
   );
 }
 
+interface Lead { id: number; created_at: number; name: string; phone: string; business: string; kind: string; city: string; comment: string; status: "new" | "done" }
+const LEAD_KIND: Record<string, string> = { ...TYPE, other: "другое", "": "—" };
+
+function Leads() {
+  const qc = useQueryClient();
+  const [all, setAll] = useState(false);
+  const q = useQuery({ queryKey: ["admin-leads"], queryFn: () => api<{ leads: Lead[] }>("/api/admin/leads"), refetchInterval: 60_000 });
+  const mark = useMutation({ mutationFn: (v: { id: number; status: Lead["status"] }) => api(`/api/admin/leads/${v.id}`, { method: "PATCH", body: { status: v.status } }), onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-leads"] }) });
+  const leads = q.data?.leads ?? [];
+  const fresh = leads.filter((l) => l.status === "new").length;
+  const rows = all ? leads : leads.filter((l) => l.status === "new");
+  return (
+    <section className="stack" aria-label="Заявки с сайта">
+      <div className="row-between">
+        <h2 className="adm-detail-title">Заявки с сайта {fresh > 0 && <span className="adm-count">{fresh}</span>}</h2>
+        <button type="button" className="chip-btn" aria-pressed={all} onClick={() => setAll(!all)}>{all ? "Только новые" : `Все · ${leads.length}`}</button>
+      </div>
+      {rows.length === 0 ? <p className="muted" style={{ margin: 0, fontSize: 14 }}>{all ? "Заявок пока нет." : "Новых заявок нет."}</p> : (
+        <div className="adm-table-wrap" style={{ maxHeight: 320 }}>
+          <table className="adm-table">
+            <thead><tr><th>Когда</th><th>Имя</th><th>Телефон</th><th>Бизнес</th><th>Город</th><th>Комментарий</th><th /></tr></thead>
+            <tbody>
+              {rows.map((l) => (
+                <tr key={l.id} style={{ cursor: "default", opacity: l.status === "done" ? 0.55 : 1 }}>
+                  <td>{new Date(l.created_at * 1000).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</td>
+                  <td>{l.name}</td>
+                  <td><a href={`tel:${l.phone.replace(/[^\d+]/g, "")}`}>{l.phone}</a></td>
+                  <td>{LEAD_KIND[l.kind] ?? l.kind}{l.business ? <span className="adm-sub">{l.business}</span> : null}</td>
+                  <td>{l.city || "—"}</td>
+                  <td style={{ whiteSpace: "normal", maxWidth: 320 }}>{l.comment || "—"}</td>
+                  <td className="num"><Button label={l.status === "new" ? "Обработано" : "Вернуть"} size="sm" variant={l.status === "new" ? "secondary" : "ghost"} isLoading={mark.isPending && mark.variables?.id === l.id} onClick={() => mark.mutate({ id: l.id, status: l.status === "new" ? "done" : "new" })} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function Dashboard({ me, onLogout }: { me: Me; onLogout: () => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
@@ -181,6 +222,7 @@ function Dashboard({ me, onLogout }: { me: Me; onLogout: () => void }) {
         <Tile label="Записей за 30 дней" value={d?.bookings_30d ?? "—"} note="без демо" />
         <Tile label="Продано на" value={d ? formatMoney(d.sales_total_minor) : "—"} note="по цене пакетов боевых студий" />
       </div>
+      <Leads />
       <div className="adm-main">
         <section className="stack" aria-label="Список студий" style={{ minWidth: 0 }}>
           <div className="adm-toolbar">

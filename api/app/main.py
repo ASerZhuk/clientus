@@ -4,10 +4,11 @@ from fastapi.responses import JSONResponse
 from .config import get_settings
 from .services.subscription import SubscriptionError
 
-from .routers import admin, internal, owner, public
+from .routers import admin, internal, leads, owner, public
 
 app = FastAPI(title="Clientus API", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
 app.include_router(public.router)
+app.include_router(leads.router)
 app.include_router(owner.router)
 if get_settings().admin_enabled:  # a customer's own server has no operator panel
     app.include_router(admin.router)

@@ -89,6 +89,21 @@ class AdminSession(Base):
     expires_at: Mapped[int] = mapped_column(Integer)
 
 
+class Lead(Base):
+    """A request from the platform landing page: a business that wants online booking."""
+
+    __tablename__ = "leads"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[int] = mapped_column(Integer, default=now_s, index=True)
+    name: Mapped[str] = mapped_column(String(80))
+    phone: Mapped[str] = mapped_column(String(32))
+    business: Mapped[str] = mapped_column(String(120), default="")
+    kind: Mapped[str] = mapped_column(String(24), default="")
+    city: Mapped[str] = mapped_column(String(80), default="")
+    comment: Mapped[str] = mapped_column(String(500), default="")
+    status: Mapped[str] = mapped_column(String(12), default="new")  # new | done
+
+
 class AuditLog(Base):
     """Who changed what on the platform side (plans, domains, suspensions, impersonation)."""
 

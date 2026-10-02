@@ -43,6 +43,23 @@ class LoginIn(Strict):
     password: str = Field(min_length=1, max_length=200)
 
 
+class LeadIn(Strict):
+    name: str = Field(min_length=1, max_length=80)
+    phone: str = Field(min_length=5, max_length=32)
+    business: str = Field(default="", max_length=120)
+    kind: Literal["", "auto", "wash", "beauty_master", "beauty_studio", "other"] = ""
+    city: str = Field(default="", max_length=80)
+    comment: str = Field(default="", max_length=500)
+    website: str = Field(default="", max_length=200)  # honeypot: people never see this field
+
+    @field_validator("phone")
+    @classmethod
+    def _phone(cls, v: str) -> str:
+        if not 10 <= len(normalize_phone(v)) <= 15:
+            raise ValueError("phone must have 10-15 digits")
+        return v
+
+
 class PasswordChangeIn(Strict):
     new: str = Field(min_length=10, max_length=200)  # same minimum as owner:create
 

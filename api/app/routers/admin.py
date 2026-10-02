@@ -14,6 +14,7 @@ from ..deps import SESSION_COOKIE, _check_origin
 from ..models import (
     AdminSession,
     AuditLog,
+    Lead,
     Booking,
     Membership,
     Operator,
@@ -149,6 +150,28 @@ def logout(request: Request, response: Response, ctx: AdminCtx = Depends(admin_d
 def me(response: Response, ctx: AdminCtx = Depends(admin_dep)) -> dict:
     response.headers["Cache-Control"] = "no-store"
     return {"email": ctx.email, "csrf_token": ctx.csrf, "plans": [{"key": p.key, "label": p.label, "price_minor": p.price_minor, "max_resources": p.max_resources, "max_bookings_month": p.max_bookings_month, "custom_domain": p.custom_domain, "remove_branding": p.remove_branding} for p in all_plans().values()]}
+
+
+# ------------------------------------------------------------------ leads
+@router.get("/leads")
+def leads_list(response: Response, ctx: AdminCtx = Depends(admin_dep)) -> dict:
+    response.headers["Cache-Control"] = "no-store"
+    with database.read_session() as db:
+        rows = list(db.scalars(select(Lead).order_by(Lead.created_at.desc()).limit(200)))
+        return {"leads": [{k: getattr(r, k) for k in ("id", "created_at", "name", "phone", "business", "kind", "city", "comment", "status")} for r in rows]}
+
+
+@router.patch("/leads/{lead_id}")
+def lead_status(lead_id: int, body: dict, ctx: AdminCtx = Depends(admin_dep)) -> dict:
+    status = body.get("status")
+    if status not in ("new", "done"):
+        raise HTTPException(422, {"code": "validation_error"})
+    with database.write_session() as db:
+        lead = db.get(Lead, lead_id)
+        if not lead:
+            raise HTTPException(404, {"code": "not_found"})
+        lead.status = status
+        return {"id": lead.id, "status": lead.status}
 
 
 # ------------------------------------------------------------------ overview
