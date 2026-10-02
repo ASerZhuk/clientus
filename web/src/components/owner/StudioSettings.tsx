@@ -196,7 +196,7 @@ function HoursEditor({ s }: { s: OwnerSettings }) {
 function OwnerPush() {
   const { slug } = useStudio();
   const qc = useQueryClient();
-  const refreshDevices = () => qc.invalidateQueries({ queryKey: ["owner-push-devices", slug] });
+  const refreshDevices = () => { qc.invalidateQueries({ queryKey: ["owner-push-devices", slug] }); qc.invalidateQueries({ queryKey: ["owner-push-on", slug] }); };
   const cfg = useQuery({ queryKey: ["push-config", slug], queryFn: () => api<PushConfig>(`/api/s/${slug}/push/config`) });
   const [support, setSupport] = useState<PushSupport | null>(null);
   const [on, setOn] = useState(false);

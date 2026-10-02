@@ -1,7 +1,7 @@
 "use client";
 
 import { BellRinging, DownloadSimple } from "@phosphor-icons/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useStudio } from "@/components/StudioProviders";
 import { AppSheet } from "@/components/ui/AppSheet";
@@ -12,6 +12,59 @@ import { currentEndpoint, detectPush, subscribePush, type PushSupport } from "@/
 import type { PushConfig } from "@/lib/types";
 
 const SNOOZE_DAYS = 7;
+
+/** Owner notifications on this device: support, whether this owner is subscribed here, and a one-tap enable. Shared by the sheet and the banner. */
+export function useOwnerPush(enabled = true) {
+  const { slug } = useStudio();
+  const qc = useQueryClient();
+  const cfg = useQuery({ queryKey: ["push-config", slug], queryFn: () => api<PushConfig>(`${studioApi(slug)}/push/config`), enabled, staleTime: 60_000 });
+  const [support, setSupport] = useState<PushSupport | null>(null);
+  useEffect(() => { if (cfg.data) setSupport(cfg.data.preview ? { state: "server-off" } : detectPush(cfg.data.enabled)); }, [cfg.data]);
+  const on = useQuery({
+    queryKey: ["owner-push-on", slug],
+    queryFn: async () => {
+      const e = Notification.permission === "granted" ? await currentEndpoint() : null;
+      return e ? (await api<{ on: boolean }>(`${ownerApi(slug)}/push?endpoint=${encodeURIComponent(e)}`)).on : false;
+    },
+    enabled: enabled && support?.state === "ready",
+    staleTime: 60_000,
+  });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const enable = async () => {
+    setBusy(true); setError("");
+    try {
+      const sub = await subscribePush(slug, cfg.data?.public_key ?? "");
+      await api(`${ownerApi(slug)}/push`, { method: "POST", body: { endpoint: sub.endpoint, keys: sub.keys } });
+      qc.setQueryData(["owner-push-on", slug], true);
+      qc.invalidateQueries({ queryKey: ["owner-push-devices", slug] });
+      return true;
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : (e as Error).message === "permission_denied" ? "Вы не разрешили уведомления. Их можно включить позже в разделе «Студия»." : (e as Error).message);
+      return false;
+    } finally { setBusy(false); }
+  };
+  const known = support !== null && (support.state !== "ready" || on.isFetched);
+  return { support, on: on.data === true, known, busy, error, enable };
+}
+
+/** Owner cabinet, any device: a slim banner until notifications are on here (a snooze hides it for a day). */
+export function OwnerPushBanner() {
+  const { slug } = useStudio();
+  const key = `push-banner:${slug}`;
+  const p = useOwnerPush();
+  const [hidden, setHidden] = useState(true);
+  useEffect(() => { try { setHidden(Date.now() - Number(localStorage.getItem(key) || 0) < 86_400_000); } catch { setHidden(false); } }, [key]);
+  if (hidden || !p.known || p.on || p.support?.state !== "ready") return null;
+  return (
+    <div className="push-banner" role="region" aria-label="Уведомления">
+      <BellRinging size={22} weight="fill" aria-hidden />
+      <span className="grow"><b>Включите уведомления</b><small>{p.error || "Узнаете о новой записи, переносе и отмене сразу."}</small></span>
+      <Button label="Включить" size="sm" variant="primary" isLoading={p.busy} onClick={() => p.enable()} />
+      <button type="button" className="push-banner-x" aria-label="Скрыть на сегодня" onClick={() => { try { localStorage.setItem(key, String(Date.now())); } catch { /* private mode */ } setHidden(true); }}>×</button>
+    </div>
+  );
+}
 const isPhone = () => window.matchMedia("(pointer: coarse)").matches && window.innerWidth < 900;
 
 function snoozed(key: string): boolean {
@@ -29,20 +82,12 @@ export function AppPrompt({ audience }: { audience: "client" | "owner" }) {
   const { slug, tenant } = useStudio();
   const { state, install } = useInstall();
   const key = `app-prompt:${slug}:${audience}`;
-  const cfg = useQuery({ queryKey: ["push-config", slug], queryFn: () => api<PushConfig>(`${studioApi(slug)}/push/config`), enabled: audience === "owner", staleTime: 60_000 });
   const [open, setOpen] = useState(false);
-  const [push, setPush] = useState<PushSupport | null>(null);
-  const [pushOn, setPushOn] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (audience !== "owner" || !cfg.data) return;
-    const support = cfg.data.preview ? ({ state: "server-off" } as PushSupport) : detectPush(cfg.data.enabled);
-    setPush(support);
-    if (support.state === "ready" && Notification.permission === "granted")
-      currentEndpoint().then((e) => (e ? api<{ on: boolean }>(`${ownerApi(slug)}/push?endpoint=${encodeURIComponent(e)}`).then((r) => setPushOn(r.on)) : undefined)).catch(() => undefined);
-  }, [audience, cfg.data, slug]);
+  const owner = useOwnerPush(audience === "owner");
+  const push = audience === "owner" && owner.known ? owner.support : null;
+  const pushOn = owner.on;
+  const busy = owner.busy;
+  const error = owner.error;
 
   const canInstall = state !== "installed";
   const canPush = audience === "owner" && (push?.state === "ready" || push?.state === "ios-install") && !pushOn;
@@ -54,17 +99,7 @@ export function AppPrompt({ audience }: { audience: "client" | "owner" }) {
   }, [key, canInstall, canPush, audience, push]);
 
   const close = () => { snooze(key); setOpen(false); };
-  const enablePush = async () => {
-    setBusy(true); setError("");
-    try {
-      const sub = await subscribePush(slug, cfg.data?.public_key ?? "");
-      await api(`${ownerApi(slug)}/push`, { method: "POST", body: { endpoint: sub.endpoint, keys: sub.keys } });
-      setPushOn(true);
-      if (!canInstall) close();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : (e as Error).message === "permission_denied" ? "Вы не разрешили уведомления. Их можно включить позже в разделе «Студия»." : (e as Error).message);
-    } finally { setBusy(false); }
-  };
+  const enablePush = async () => { if (await owner.enable() && !canInstall) close(); };
   const doInstall = async () => { if (await install() && !canPush) close(); };
 
   const ios = state === "ios";

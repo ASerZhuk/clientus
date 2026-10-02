@@ -9,7 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useState } from "react";
 import { AssistantSheet } from "@/components/client/AssistantSheet";
-import { AppPrompt } from "@/components/AppPrompt";
+import { AppPrompt, OwnerPushBanner } from "@/components/AppPrompt";
 import { useStudio } from "@/components/StudioProviders";
 import { Input } from "@/components/ui/Input";
 import { api, ApiError, ownerApi, setCsrf } from "@/lib/api";
@@ -114,7 +114,7 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
     <OwnerCtx.Provider value={{ email: me.data.email, logout, subscription: me.data.subscription }}>
       <div className="studio-owner">
         <OwnerHeader />
-        <div className="page notice"><SubscriptionBanner sub={me.data.subscription} /></div>
+        <div className="page notice"><SubscriptionBanner sub={me.data.subscription} /><OwnerPushBanner /></div>
         {children}
       </div>
       <nav className="dock-wrap" aria-label="Кабинет">
