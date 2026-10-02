@@ -8,9 +8,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useStudio, useVocab } from "@/components/StudioProviders";
 import { api, ApiError, studioApi } from "@/lib/api";
-import { formatDuration, formatMoney, longDayLabel, telHref, timeOf } from "@/lib/format";
+import { formatDuration, formatMoney, longDayLabel, shownStatus, telHref, timeOf } from "@/lib/format";
 import { downloadIcs } from "@/lib/ics";
-import { detectPush, subscribePush, unsubscribePush, currentEndpoint, type PushSupport } from "@/lib/push";
+import { detectPush, deniedHelp, onPermissionMaybeChanged, subscribePush, currentEndpoint, type PushSupport } from "@/lib/push";
 import type { ClientBooking, PushConfig } from "@/lib/types";
 
 const STATUS_BASE: Record<string, string> = { booked: "Запись подтверждена", cancelled: "Запись отменена" };
@@ -25,8 +25,16 @@ function Reminder({ token }: { token: string }) {
 
   useEffect(() => {
     if (!cfg.data) return;
-    setSupport(cfg.data.preview ? { state: "server-off" } : detectPush(cfg.data.enabled));
-    currentEndpoint().then((e) => setOn(Boolean(e) && Notification.permission === "granted")).catch(() => undefined);
+    const check = () => {
+      setSupport(cfg.data!.preview ? { state: "server-off" } : detectPush(cfg.data!.enabled));
+      // the device may be subscribed for something else (e.g. the owner's cabinet): ask the server about THIS booking
+      currentEndpoint()
+        .then((e) => (e && Notification.permission === "granted" ? api<{ on: boolean }>(`${studioApi(slug)}/my/push?endpoint=${encodeURIComponent(e)}`, { bookingToken: token }).then((r) => r.on) : false))
+        .then(setOn)
+        .catch(() => setOn(false));
+    };
+    check();
+    return onPermissionMaybeChanged(check);
   }, [cfg.data]);
 
   if (!support || !cfg.data) return null;
@@ -36,7 +44,8 @@ function Reminder({ token }: { token: string }) {
     setError("");
     try {
       if (on) {
-        const endpoint = await unsubscribePush();
+        // only this booking's reminder: the device subscription may serve other bookings or the owner's cabinet
+        const endpoint = await currentEndpoint();
         if (endpoint) await api(`${studioApi(slug)}/my/push?endpoint=${encodeURIComponent(endpoint)}`, { method: "DELETE", bookingToken: token });
         setOn(false);
       } else {
@@ -45,7 +54,7 @@ function Reminder({ token }: { token: string }) {
         setOn(true);
       }
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : (e as Error).message === "permission_denied" ? "Вы не разрешили уведомления." : "Не удалось включить напоминание.");
+      setError(e instanceof ApiError ? e.message : (e as Error).message === "permission_denied" ? "Вы не разрешили уведомления." : (e as Error).message || "Не удалось включить напоминание.");
     } finally {
       setBusy(false);
     }
@@ -60,7 +69,7 @@ function Reminder({ token }: { token: string }) {
     );
   const note: Record<string, string> = {
     "ios-install": "На iPhone напоминания работают после установки: нажмите «Поделиться» → «На экран Домой», затем откройте студию с иконки и включите напоминание. Пока добавьте запись в календарь.",
-    denied: "Уведомления заблокированы в настройках браузера. Добавьте запись в календарь — он напомнит сам.",
+    denied: `${deniedHelp()} Или добавьте запись в календарь — он напомнит сам.`,
     unsupported: "Этот браузер не поддерживает уведомления. Добавьте запись в календарь.",
     insecure: "Уведомления работают только на защищённом адресе (https). Добавьте запись в календарь.",
     "server-off": "Уведомления сейчас недоступны. Добавьте запись в календарь.",
@@ -92,15 +101,15 @@ export function BookingDetails({ booking, token, onChanged }: { booking: ClientB
     <div className="stack">
       <div className="panel stack">
         <div className="row-between">
-          <b style={{ fontSize: 17 }}>{STATUS_BASE[booking.status] ?? vocab(booking.status === "accepted" ? "status_accepted" : "status_ready")}</b>
-          <span className={`status-dot status-${booking.status}`} aria-hidden />
+          <b style={{ fontSize: 17 }}>{STATUS_BASE[shownStatus(booking)] ?? vocab("status_ready")}</b>
+          <span className={`status-dot status-${shownStatus(booking)}`} aria-hidden />
         </div>
         <dl className="summary" style={{ margin: 0 }}>
           <div><dt>Услуга</dt><dd>{booking.service_name}</dd></div>
           <div><dt>Когда</dt><dd>{longDayLabel(booking.start_min, tz)}, {timeOf(booking.start_min, tz)}</dd></div>
           {days > 1 && <div><dt>Готово</dt><dd>{longDayLabel(booking.end_min, tz)}, {timeOf(booking.end_min, tz)}</dd></div>}
           <div><dt>Длительность</dt><dd>{formatDuration(booking.end_min - booking.start_min)}</dd></div>
-          {booking.post_name && tenant.profile.features.resource_profiles && <div><dt>Мастер</dt><dd>{booking.post_name}</dd></div>}
+          {booking.post_name && <div><dt>{vocab("resource_one").replace(/^./, (c) => c.toUpperCase())}</dt><dd>{booking.post_name}</dd></div>}
           {booking.car && <div><dt>Автомобиль</dt><dd>{booking.car}{booking.plate ? ` · ${booking.plate}` : ""}</dd></div>}
           <div><dt>Стоимость</dt><dd>{formatMoney(booking.price_minor, tenant.currency)}</dd></div>
         </dl>

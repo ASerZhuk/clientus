@@ -257,7 +257,7 @@ export interface AssistantReply {
   intent?: string;
   options?: AssistantOption[];
   items?: unknown[];
-  action?: { type: "book"; service_id: number; start_min?: number };
+  action?: { type: "book"; service_id: number; start_min?: number } | { type: "open" | "done"; to: string };
 }
 
 export interface PushConfig {

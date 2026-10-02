@@ -41,7 +41,7 @@ sudo -u clientus python3 -m venv "$ROOT/api/.venv"
 sudo -u clientus "$ROOT/api/.venv/bin/pip" install --quiet -r "$ROOT/api/requirements.txt"
 
 echo "==> frontend (build takes a few minutes)"
-sudo -u clientus sh -c "cd $ROOT/web && pnpm install --frozen-lockfile && pnpm build"
+sudo -u clientus sh -c "cd $ROOT/web && pnpm install --frozen-lockfile && pnpm build && cp -a .next/static .next/standalone/.next/static && cp -a public .next/standalone/public"
 
 echo "==> database migrations"
 sudo -u clientus sh -c "cd $ROOT/api && set -a && . $ROOT/.env && set +a && .venv/bin/alembic upgrade head"
@@ -56,7 +56,7 @@ cp "$SRC"/Caddyfile /etc/caddy/Caddyfile
 systemctl reload caddy || systemctl restart caddy
 
 echo "==> daily backup (03:15) of the database and photos"
-( crontab -u clientus -l 2>/dev/null | grep -v backup.sh; echo "15 3 * * * DATA_DIR=$ROOT/data $ROOT/deploy/backup.sh" ) | crontab -u clientus -
+( { crontab -u clientus -l 2>/dev/null || true; } | grep -v backup.sh || true; echo "15 3 * * * DATA_DIR=$ROOT/data $ROOT/deploy/backup.sh" ) | crontab -u clientus -
 
 echo
 echo "Done. Open https://$DOMAIN/  (the certificate is issued on the first visit; DNS must already point here)."

@@ -1,6 +1,7 @@
 import { getBase, getTenant } from "@/lib/server";
 
-/** Dynamic per studio: id, scope and start_url stay inside /s/<slug>/ so studios install as separate apps. */
+/** Dynamic per studio: id, scope and start_url stay inside /s/<slug>/ (with the slash, so studios never overlap:
+ *  "alex" does not capture "alexmotors"). src/proxy.ts sends /s/<slug> to /s/<slug>/. */
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const t = await getTenant(slug);

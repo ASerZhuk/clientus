@@ -30,6 +30,15 @@ async function resolveHost(host: string): Promise<string | null> {
 }
 
 export async function proxy(request: NextRequest) {
+  // An installed studio app owns /s/<slug>/ (with the slash, so "alex" never captures "alexmotors").
+  // A link or a stale browser cache without the slash would leave the app and show Chrome's address bar: bring it back.
+  if (/^\/s\/[^/]+$/.test(request.nextUrl.pathname)) {
+    // a raw Location header: NextResponse.redirect would normalise the slash away again
+    // 307 is temporary on purpose: browsers do not memorise it
+    const proto = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol.replace(":", "");
+    const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? request.nextUrl.host;
+    return new Response(null, { status: 307, headers: { Location: `${proto}://${host}${request.nextUrl.pathname}/${request.nextUrl.search}` } });
+  }
   const hostname = (request.headers.get("host") ?? "").toLowerCase().split(":")[0];
   if (!hostname || platformHosts().includes(hostname)) return NextResponse.next();
   const path = request.nextUrl.pathname;

@@ -81,3 +81,6 @@ export function newKey(): string {
   const b = crypto.getRandomValues(new Uint8Array(16));
   return Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 }
+
+/** Shown status: no manual steps, a booking counts as done once its time is over. */
+export const shownStatus = (b: { status: string; end_min: number }) => (b.status === "cancelled" ? "cancelled" : Date.now() / 60_000 >= b.end_min ? "ready" : "booked");

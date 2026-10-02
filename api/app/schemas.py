@@ -171,6 +171,12 @@ class PushSubscriptionIn(Strict):
     keys: PushKeys
 
 
+class PushRotateIn(Strict):
+    """The browser replaced a subscription (pushsubscriptionchange): knowing the old endpoint proves ownership."""
+    old_endpoint: str = Field(min_length=10, max_length=600, pattern=r"^https://")
+    subscription: PushSubscriptionIn
+
+
 class AssistantTurn(Strict):
     role: Literal["me", "bot"]
     text: str = Field(max_length=1500)

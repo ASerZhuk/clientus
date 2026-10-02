@@ -144,6 +144,7 @@ class Membership(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     tenant_id: Mapped[int] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), primary_key=True)
     role: Mapped[str] = mapped_column(String(16), default="owner")
+    seen_at: Mapped[int | None] = mapped_column(Integer)  # app icon badge counts client bookings made after this
 
 
 class OwnerSession(Base):
@@ -402,6 +403,11 @@ class PushSubscription(TenantScoped, Base):
     auth: Mapped[str] = mapped_column(String(80))
     created_at: Mapped[int] = mapped_column(Integer, default=now_s)
     disabled_at: Mapped[int | None] = mapped_column(Integer)
+    device: Mapped[str] = mapped_column(String(80), default="", server_default="")  # "Android · Chrome", from the User-Agent
+    last_success_at: Mapped[int | None] = mapped_column(Integer)
+    failure_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    last_error: Mapped[str | None] = mapped_column(String(200))
+    origin: Mapped[str] = mapped_column(String(200), default="", server_default="")  # "https://studio.ru": the app that subscribed
     __table_args__ = (
         UniqueConstraint("tenant_id", "audience", "endpoint", "booking_id", name="uq_push_endpoint"),
         ForeignKeyConstraint(["tenant_id", "booking_id"], ["bookings.tenant_id", "bookings.id"], ondelete="CASCADE"),

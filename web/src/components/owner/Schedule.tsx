@@ -6,10 +6,11 @@ import { Banner } from "@astryxdesign/core/Banner";
 import { EmptyState } from "@astryxdesign/core/EmptyState";
 import { Skeleton } from "@astryxdesign/core/Skeleton";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStudio, useVocab } from "@/components/StudioProviders";
 import { api, ApiError, ownerApi } from "@/lib/api";
-import { dateKeyOf, formatMoney, fullDateLabel, shiftDateKey, timeOf, todayKey } from "@/lib/format";
+import { useDoParam } from "@/lib/hooks";
+import { dateKeyOf, formatMoney, fullDateLabel, shiftDateKey, shownStatus, timeOf, todayKey } from "@/lib/format";
 import type { OwnerBooking, OwnerSchedule, OwnerStats } from "@/lib/types";
 import { BlockSheet } from "./BlockSheet";
 import { BookingSheet } from "./BookingSheet";
@@ -50,6 +51,8 @@ export function Schedule() {
   const [openId, setOpenId] = useState<number | null>(null);
   const [quick, setQuick] = useState(false);
   const [block, setBlock] = useState(false);
+  const req = useDoParam();
+  useEffect(() => { const what = req?.get("do"); if (what === "block") setBlock(true); else if (what === "new-booking") setQuick(true); }, [req]);
   const days = view === "day" ? 1 : 7;
   const from = view === "week" ? shiftDateKey(anchor, -((new Date(`${anchor}T12:00:00Z`).getUTCDay() + 6) % 7)) : anchor;
 
@@ -58,6 +61,15 @@ export function Schedule() {
     queryFn: () => api<OwnerSchedule>(`${ownerApi(slug)}/schedule?from=${from}&days=${days}`),
     refetchInterval: 60_000,
   });
+
+  // the owner is looking at the schedule: new bookings are seen, the number on the app icon goes away
+  const lastSeen = useRef(0);
+  useEffect(() => {
+    if (!q.dataUpdatedAt || document.visibilityState !== "visible" || Date.now() - lastSeen.current < 10_000) return;
+    lastSeen.current = Date.now();
+    api(`${ownerApi(slug)}/seen`, { method: "POST" }).catch(() => undefined);
+    (navigator as Navigator & { clearAppBadge?: () => Promise<void> }).clearAppBadge?.().catch(() => undefined);
+  }, [q.dataUpdatedAt, slug]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, { bookings: OwnerBooking[]; blocks: OwnerSchedule["blocks"] }>();
@@ -112,8 +124,7 @@ export function Schedule() {
                       <div className="service-desc">{it.b.client_name}{it.b.car ? ` · ${it.b.car}` : ""}</div>
                     </span>
                     <span className="stack" style={{ alignItems: "flex-end", gap: 4 }}>
-                      <span className="row" style={{ gap: 8, fontSize: 15 }}><i className={`status-dot status-${it.b.status}`} />{statusLabel(tenant.profile.kind, it.b.status)}</span>
-                      {it.b.due_minor > 0 && it.b.status !== "cancelled" && <span className="muted" style={{ fontSize: 14 }}>долг {formatMoney(it.b.due_minor, tenant.currency)}</span>}
+                      <span className="row" style={{ gap: 8, fontSize: 15 }}><i className={`status-dot status-${shownStatus(it.b)}`} />{statusLabel(tenant.profile.kind, shownStatus(it.b))}</span>
                     </span>
                   </button>
                 ) : "k" in it && it.k ? (

@@ -1,0 +1,21 @@
+# /etc/systemd/system/clientus-web@.service — Next.js standalone build made on the developer PC
+[Unit]
+Description=Clientus web (%i)
+After=network.target clientus-api@%i.service
+
+[Service]
+User=clientus
+WorkingDirectory=/srv/clientus/%i/current/web
+EnvironmentFile=/srv/clientus/%i/.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+# PORT and INTERNAL_API_URL come from the instance .env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

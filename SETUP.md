@@ -36,7 +36,7 @@ pnpm test:web      # Vitest: formatting, timezone conversion, Zod schemas, ICS
 pnpm --dir web typecheck
 pnpm build && pnpm test:e2e   # Playwright: client books -> owner sees it -> time is occupied (mobile + desktop)
 ```
-Playwright starts its own throwaway API (port 18100, temp data dir) and `next start` (13100). If Playwright's own
+Playwright starts its own throwaway API (port 18100, temp data dir) and the standalone web server (`web/scripts/serve.sh`, 13100). If Playwright's own
 Chromium download is unavailable, point `PW_CHROMIUM=/path/to/chrome`.
 
 ## 2. Environment variables (`.env`, never committed)
@@ -63,6 +63,8 @@ restart API and worker. Without keys the app stays honest: the UI says notificat
 and the calendar (.ics) fallback remains. Push on iPhone works only for a site installed to the Home Screen (iOS 16.4+); the UI explains this and never promises it in a plain Safari tab.
 
 ## 4. Production on a VPS (Ubuntu example)
+
+**Our platform server: use `deploy/platform/README.md`** (build on the PC, `sh scripts/server.sh setup|deploy test|deploy prod`, prod + test on one VPS, automatic rollback). The manual steps below describe a single instance that builds on the server; the customer-server package (`tenant:export`) works that way.
 
 ```sh
 sudo useradd -r -m -d /srv/clientus clientus

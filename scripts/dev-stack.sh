@@ -17,7 +17,7 @@ export PUBLIC_ORIGINS="http://localhost:3000,https://localhost:3443$(for ip in $
 cd "$ROOT/api" && nohup .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8010 > "$LOG/clientus-api.log" 2>&1 &
 cd "$ROOT/api" && nohup .venv/bin/python -m app.worker > "$LOG/clientus-worker.log" 2>&1 &
 echo $! > "$LOG/clientus-worker.pid"
-cd "$ROOT/web" && INTERNAL_API_URL=http://127.0.0.1:8010 nohup npx next start -p 3000 > "$LOG/clientus-web.log" 2>&1 &
+cd "$ROOT/web" && INTERNAL_API_URL=http://127.0.0.1:8010 HOSTNAME=0.0.0.0 nohup sh scripts/serve.sh 3000 > "$LOG/clientus-web.log" 2>&1 &
 # HTTPS for phones in the same Wi-Fi: install, service worker and push need a secure origin, plain http://IP is not one.
 # Caddy issues certificates from its own local CA; a phone trusts them after installing the CA from http://IP:3080/
 if command -v caddy >/dev/null 2>&1; then

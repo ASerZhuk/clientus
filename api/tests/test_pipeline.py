@@ -177,3 +177,4 @@ def test_republishing_a_sample_rebuilds_demo_data_and_drops_removed_items(app_db
         assert [r.name for r in db.scalars(select(Resource))] == ["Подъёмник"]
         demo = list(db.scalars(select(Booking)))
         assert demo and {b.service_name for b in demo} == {"Замена масла"} and all(b.is_demo for b in demo)
+

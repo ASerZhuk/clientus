@@ -5,12 +5,13 @@ After=network.target clientus-api.service
 
 [Service]
 User=clientus
-WorkingDirectory=/srv/clientus/web
+WorkingDirectory=/srv/clientus/web/.next/standalone
 EnvironmentFile=/srv/clientus/.env
 Environment=NODE_ENV=production
 Environment=INTERNAL_API_URL=http://127.0.0.1:8000
 Environment=HOSTNAME=127.0.0.1
-ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -p 3000 -H 127.0.0.1
+Environment=PORT=3000
+ExecStart=/usr/bin/node server.js
 Restart=always
 RestartSec=3
 NoNewPrivileges=true

@@ -35,7 +35,7 @@ PERIOD_CHIPS = [("Сегодня", "today"), ("Эта неделя", "week"), ("
 
 CLIENT_EXAMPLES_MASTERS = ["Записаться на ближайшее время", "Хочу записаться на завтра", "Какие мастера принимают?", "Как найти студию?"]
 CLIENT_EXAMPLES = ["Записаться на ближайшее время", "Хочу записаться на завтра", "Записаться на выходные", "Как найти студию?"]
-OWNER_EXAMPLES = ["Что у меня завтра?", "Сколько машин было на неделе?", "Сколько денег получено?", "Кто не оплатил?"]
+OWNER_EXAMPLES = ["Что у меня завтра?", "Добавить услугу", "Изменить график", "Сколько машин было на неделе?"]
 
 
 def money(minor: int, currency: str) -> str:
@@ -258,7 +258,7 @@ def _period_options(intent: str) -> list[dict]:
 def _owner_answer(intent: str, parsed: intents.Parsed, ctx: dict, reads: OwnerReads) -> Reply:
     cur, tz, today = reads.settings.currency, reads.tz, reads.today
     if intent == "help":
-        return Reply("answered", "Спросите про расписание, заезды, деньги или неоплаченные работы.", intent,
+        return Reply("answered", "Спросите про записи или скажите, что сделать: «добавь услугу замена масла 1500 ₽ 20 минут», «суббота выходной», «запиши Ивана на завтра в 10».", intent,
                      options=[{"label": e, "text": e, "context": {}} for e in OWNER_EXAMPLES])
     period = ctx.get("period") if isinstance(ctx.get("period"), str) else parsed.period
     if period not in stats.PERIODS:
@@ -322,6 +322,74 @@ def owner_facts(reads: OwnerReads) -> str:
         lines.append(f"Ближайшая запись: {when_text(nb['start_min'], reads.tz, reads.today)} — {nb['service']}, {nb['client']}.")
     lines.append("Разделы кабинета: Расписание (записи, статусы, оплаты), Услуги (цены, рабочие места), Студия (контакты, график, фото).")
     return "\n".join(lines)
+
+
+# ------------------------------------------------------------------ owner commands
+# Keyword rules, no model: "add a service", "change the hours" open the matching form in the cabinet.
+# The assistant itself still changes nothing - the owner confirms in the usual form.
+ACT = ("добав", "созда", "заведи", "нов", "измен", "помен", "смен", "постав", "сдела", "настро", "убер", "удал",
+       "обнов", "редакт", "исправ", "скрой", "скры", "закр", "заблок", "занять", "открой", "выстав")
+NEW = ("добав", "созда", "заведи", "нов")
+
+
+def _has(norm: str, stems: tuple[str, ...]) -> bool:
+    return any(s in norm for s in stems)
+
+
+def wants_change(text: str, history: list[dict]) -> bool:
+    """Cheap gate before the model: an action verb, or an answer to the assistant's own question."""
+    norm = intents.normalize(text)
+    last_bot = next((h["text"] for h in reversed(history) if h.get("role") == "bot"), "")
+    return _has(norm, ACT + ("запиши", "запис")) or last_bot.rstrip().endswith("?")
+
+
+def command_context(reads: OwnerReads) -> dict:
+    """What the model needs to fill a command: ids and names only, no clients or money."""
+    vocab = get_profile(reads.settings.business_type).vocab
+    services = _services_for_parsing(reads)
+    resources = reads.db.scalars(select(Resource).where(Resource.is_active.is_(True)).order_by(Resource.sort, Resource.id))
+    return {
+        "name": reads.settings.name, "today": reads.today.isoformat(), "weekday": WEEKDAYS_LONG[reads.today.weekday()],
+        "services": "\n".join(f"{s.id}: {s.name} · {s.price_minor // 100} · {s.duration_min}" for s in services) or "(нет)",
+        "resources_title": vocab.get("resource_section", "Рабочие места"),
+        "resources": "\n".join(f"{r.id}: {r.name}" for r in resources) or "(нет)",
+        "hours": _hours_text(reads) or "не задан",
+    }
+
+
+def owner_command(text: str, reads: OwnerReads) -> Reply | None:
+    norm = intents.normalize(text)
+    if "запиши" in norm or ("запис" in norm and _has(norm, NEW)):
+        return Reply("answered", "Открываю новую запись: клиент, услуга и время.", "command", action={"type": "open", "to": "/owner?do=new-booking"})
+    if not _has(norm, ACT):
+        return None
+    vocab = get_profile(reads.settings.business_type).vocab
+    place = vocab.get("resource_one", "место")
+
+    def go(to: str, say: str) -> Reply:
+        return Reply("answered", say, "command", action={"type": "open", "to": to})
+
+    if _has(norm, ("заблок", "занять", "перерыв", "обед")):
+        return go("/owner?do=block", f"Открываю: {vocab.get('resource_block', 'занять место').lower()} на время.")
+    if _has(norm, ("график", "расписани", "часы", "режим работ", "время работ", "выходн", "праздн", "особ")):
+        return go("/owner/studio?do=hours", "Открываю график работы: дни, часы и особые дни.")
+    if _has(norm, ("бокс", "мест", "подъемник", "пост", "мастер", "сотрудник", "стенд")) and _has(norm, NEW):
+        return go("/owner/services?do=new-resource", f"Открываю добавление: {vocab.get('resource_new', 'новое ' + place).lower()}.")
+    if _has(norm, ("фото", "логотип", "картин", "галере")):
+        return go("/owner/studio?do=photos", "Открываю фото и логотип.")
+    if _has(norm, ("адрес", "телефон", "название", "описани", "карт")):
+        return go("/owner/studio?do=basics", "Открываю основные данные студии.")
+    if _has(norm, ("уведомлен", "пуш")):
+        return go("/owner/studio?do=push", "Открываю настройки уведомлений.")
+    services = _services_for_parsing(reads)
+    matched = [s for s in services if s.id in intents.parse(text, "owner", [{"id": s.id, "name": s.name, "keywords": s.keywords or []} for s in services], reads.today).service_ids]
+    if _has(norm, ("услуг", "прайс", "цен", "стоимост", "длительн")) or matched:
+        if _has(norm, NEW) and not matched:
+            return go("/owner/services?do=new-service", "Открываю форму новой услуги: название, цена и длительность.")
+        if len(matched) == 1:
+            return go(f"/owner/services?do=edit-service&id={matched[0].id}", f"Открываю услугу «{matched[0].name}».")
+        return go("/owner/services", "Открываю услуги — выберите нужную.")
+    return None
 
 
 INFO_INTENTS = ("masters", "address", "phone", "hours", "cancel_policy")
@@ -442,6 +510,8 @@ def answer(audience: str, text: str, ctx: dict | None, reads: PublicReads | Owne
         return _booking_flow(text, parsed, ctx, reads, history or [])
 
     assert isinstance(reads, OwnerReads)
+    if not ctx and not llm.enabled() and (cmd := owner_command(text, reads)):
+        return cmd  # without a model a command opens the right form; with a model the router executes it
     reply = _rule_answer(audience, text, ctx, reads)
     # a tapped chip already carries an exact answer; free text gets natural wording from the model
     if ctx or not llm.enabled():

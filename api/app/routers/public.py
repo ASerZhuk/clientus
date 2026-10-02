@@ -11,7 +11,7 @@ from ..config import get_settings
 from ..deps import TenantCtx, client_booking_id, tenant_dep
 from ..models import Booking, PushSubscription, Service, TenantSettings
 from ..ratelimit import limit_request
-from ..schemas import AssistantIn, BookingIn, PushSubscriptionIn
+from ..schemas import AssistantIn, BookingIn, PushRotateIn, PushSubscriptionIn
 from ..services import assistant, subscription
 from ..services import booking as bk
 from ..services import media, push
@@ -172,16 +172,36 @@ def push_config(tenant: TenantCtx = Depends(tenant_dep)) -> dict:
 
 @router.post("/s/{slug}/my/push", status_code=204)
 def my_push_subscribe(
-    body: PushSubscriptionIn, booking_id: int = Depends(client_booking_id), tenant: TenantCtx = Depends(tenant_dep)
+    body: PushSubscriptionIn, request: Request, booking_id: int = Depends(client_booking_id), tenant: TenantCtx = Depends(tenant_dep)
 ) -> None:
     if not push.vapid_configured():
         raise HTTPException(503, {"code": "push_not_configured"})
+    device, origin = push.device_label(request.headers.get("user-agent")), push.request_origin(request.headers)
     with database.write_session(tenant.id) as db:
         existing = db.scalar(select(PushSubscription).where(PushSubscription.audience == "client", PushSubscription.endpoint == body.endpoint, PushSubscription.booking_id == booking_id))
         if existing:
-            existing.p256dh, existing.auth, existing.disabled_at = body.keys.p256dh, body.keys.auth, None
+            existing.p256dh, existing.auth, existing.disabled_at, existing.device, existing.failure_count, existing.origin = body.keys.p256dh, body.keys.auth, None, device, 0, origin
         else:
-            db.add(PushSubscription(tenant_id=tenant.id, audience="client", booking_id=booking_id, endpoint=body.endpoint, p256dh=body.keys.p256dh, auth=body.keys.auth))
+            db.add(PushSubscription(tenant_id=tenant.id, audience="client", booking_id=booking_id, endpoint=body.endpoint, p256dh=body.keys.p256dh, auth=body.keys.auth, device=device, origin=origin))
+
+
+@router.post("/s/{slug}/push/rotate", status_code=204)
+def push_rotate(body: PushRotateIn, request: Request, tenant: TenantCtx = Depends(tenant_dep)) -> None:
+    """Called by the service worker when the browser replaces a subscription, so notifications keep arriving
+    without the person switching them on again. Covers every audience of this studio tied to the old endpoint."""
+    limit_request(request, tenant.id, "push-rotate", 10, 60)
+    new = body.subscription
+    with database.write_session(tenant.id) as db:
+        for sub in db.scalars(select(PushSubscription).where(PushSubscription.endpoint == body.old_endpoint)):
+            sub.endpoint, sub.p256dh, sub.auth, sub.disabled_at, sub.failure_count, sub.last_error = new.endpoint, new.keys.p256dh, new.keys.auth, None, 0, None
+
+
+@router.get("/s/{slug}/my/push")
+def my_push_status(endpoint: str = Query(min_length=10), booking_id: int = Depends(client_booking_id), tenant: TenantCtx = Depends(tenant_dep)) -> dict:
+    """Is THIS booking's reminder on for this device? A device can be subscribed for other reasons (e.g. as the owner)."""
+    with database.read_session(tenant.id) as db:
+        sub = db.scalar(select(PushSubscription.id).where(PushSubscription.audience == "client", PushSubscription.booking_id == booking_id, PushSubscription.endpoint == endpoint, PushSubscription.disabled_at.is_(None)))
+    return {"on": sub is not None}
 
 
 @router.delete("/s/{slug}/my/push", status_code=204)

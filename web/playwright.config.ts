@@ -16,6 +16,6 @@ export default defineConfig({
   ],
   webServer: [
     { command: "sh ../scripts/e2e-api.sh", url: "http://127.0.0.1:18100/api/health", reuseExistingServer: false, timeout: 60_000 },
-    { command: "npx next start -p 13100", url: "http://127.0.0.1:13100/s/graphite", reuseExistingServer: false, timeout: 60_000, env: { INTERNAL_API_URL: "http://127.0.0.1:18100", PLATFORM_HOSTS: "127.0.0.1,localhost" } },
+    { command: "sh scripts/serve.sh 13100", url: "http://127.0.0.1:13100/s/graphite", reuseExistingServer: false, timeout: 60_000, env: { INTERNAL_API_URL: "http://127.0.0.1:18100", PLATFORM_HOSTS: "127.0.0.1,localhost" } },
   ],
 });

@@ -113,7 +113,7 @@ def test_cancel_skips_reminder_and_notifies_owner(app_db, tmp_path):
     add_sub(tid, "owner")
     rec = Recorder()
     push.run_once(rec, now=local_start(3, 10) * 60)
-    titles = [p["title"] for _, p in rec.sent]
+    titles = [p["notification"]["title"] for _, p in rec.sent]
     assert "Запись отменена" in titles and "Напоминание о записи" not in titles
 
 
@@ -160,3 +160,94 @@ def test_no_vapid_means_honest_skip(app_db, tmp_path, monkeypatch):
     add_sub(tid, "owner")
     push.run_once(now=local_start(3, 10) * 60)
     assert {j.status for j in jobs(tid)} == {"skipped"} and jobs(tid)[0].last_error == "push_not_configured"
+
+
+def test_one_device_as_client_then_owner_keeps_both_subscriptions_apart(client, tmp_path):
+    """A phone that enabled a booking reminder is not thereby subscribed as the owner, and the owner switching
+    notifications off does not silence the client's reminder on the same device."""
+    from tests.api_helpers import BOOK, first_slot, owner_login, service_id
+
+    setup_tenant(tmp_path)
+    sid = service_id(client, "alpha")
+    r = client.post("/api/s/alpha/bookings", json={**BOOK, "service_id": sid, "start_min": first_slot(client, "alpha", sid)}, headers={"Idempotency-Key": "device-key-0001"})
+    mine = {"X-Booking-Token": r.json()["access_token"]}
+    device = {"endpoint": "https://fcm.example/send/device-1", "keys": {"p256dh": "p" * 20, "auth": "a" * 10}}
+    q = {"endpoint": device["endpoint"]}
+
+    assert client.post("/api/s/alpha/my/push", json=device, headers=mine).status_code == 204
+    assert client.get("/api/s/alpha/my/push", params=q, headers=mine).json() == {"on": True}
+    csrf = owner_login(client)
+    assert client.get("/api/s/alpha/owner/push", params=q).json() == {"on": False}  # the cabinet must offer "enable"
+
+    assert client.post("/api/s/alpha/owner/push", json=device, headers=csrf).status_code == 204
+    assert client.get("/api/s/alpha/owner/push", params=q).json() == {"on": True}
+    assert client.delete("/api/s/alpha/owner/push", params=q, headers=csrf).status_code == 204
+    assert client.get("/api/s/alpha/owner/push", params=q).json() == {"on": False}
+    assert client.get("/api/s/alpha/my/push", params=q, headers=mine).json() == {"on": True}  # reminder untouched
+
+
+def test_delivery_health_badge_rotation_and_device_list(client, tmp_path):
+    from tests.api_helpers import BOOK, first_slot, owner_login, service_id
+
+    setup_tenant(tmp_path)
+    tid = ctx()
+    csrf = owner_login(client)
+    phone = {"endpoint": "https://fcm.example/send/owner-phone", "keys": {"p256dh": "p" * 20, "auth": "a" * 10}}
+    android = {"User-Agent": "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/131.0 Mobile Safari/537.36", "Origin": "http://localhost:3000"}
+    assert client.post("/api/s/alpha/owner/push", json=phone, headers={**csrf, **android}).status_code == 204
+
+    sid = service_id(client, "alpha")
+    r = client.post("/api/s/alpha/bookings", json={**BOOK, "service_id": sid, "start_min": first_slot(client, "alpha", sid)}, headers={"Idempotency-Key": "badge-key-00001"})
+    mine = {"X-Booking-Token": r.json()["access_token"]}
+    rec = Recorder()
+    push.run_once(rec)
+    owner_push = next(p for e, p in rec.sent if e == phone["endpoint"])
+    assert owner_push["web_push"] == 8030 and owner_push["mutable"] is True and owner_push["kind"] == "new"  # declarative for Safari
+    assert owner_push["notification"]["app_badge"] == 1  # one client booking not seen yet
+    assert owner_push["notification"]["navigate"].endswith("/s/alpha/owner") and owner_push["notification"]["navigate"].startswith("http")
+
+    devices = client.get("/api/s/alpha/owner/push/devices", params={"endpoint": phone["endpoint"]}).json()["devices"]
+    assert len(devices) == 1 and devices[0]["device"] == "Android · Chrome" and devices[0]["this_device"]
+    assert devices[0]["last_success_at"] and devices[0]["failure_count"] == 0
+
+    # the owner opens the schedule: everything so far is seen
+    assert client.post("/api/s/alpha/owner/seen", headers=csrf).json() == {"badge": 0}
+    from app.models import Membership
+
+    with database.read_session() as db:
+        m = db.scalar(select(Membership))
+        uid, seen = m.user_id, m.seen_at
+    with database.read_session(tid) as db:
+        assert push.unseen_for_owners(db, tid, {uid})[uid] == 0
+    with database.write_session(tid) as db:  # a booking made after that moment counts again
+        db.scalar(select(Booking)).created_at = seen + 10
+    with database.read_session(tid) as db:
+        assert push.unseen_for_owners(db, tid, {uid})[uid] == 1
+
+    # the browser replaces the subscription: the owner and the client reminder both move to the new endpoint
+    client_sub = {**phone}
+    assert client.post("/api/s/alpha/my/push", json=client_sub, headers=mine).status_code == 204
+    new = {"endpoint": "https://fcm.example/send/owner-phone-2", "keys": {"p256dh": "q" * 20, "auth": "b" * 10}}
+    assert client.post("/api/s/alpha/push/rotate", json={"old_endpoint": phone["endpoint"], "subscription": new}).status_code == 204
+    assert client.get("/api/s/alpha/owner/push", params={"endpoint": new["endpoint"]}).json() == {"on": True}
+    assert client.get("/api/s/alpha/my/push", params={"endpoint": new["endpoint"]}, headers=mine).json() == {"on": True}
+    assert client.get("/api/s/alpha/owner/push", params={"endpoint": phone["endpoint"]}).json() == {"on": False}
+
+    # a failed delivery is counted; switching a device off removes it from the list
+    dev_id = client.get("/api/s/alpha/owner/push/devices").json()["devices"][0]["id"]
+    push.record_delivery({dev_id: "push service timeout"})
+    dev = client.get("/api/s/alpha/owner/push/devices").json()["devices"][0]
+    assert dev["failure_count"] == 1 and dev["last_error"] == "push service timeout"
+    assert client.delete(f"/api/s/alpha/owner/push/devices/{dev_id}", headers=csrf).status_code == 204
+    assert client.get("/api/s/alpha/owner/push/devices").json()["devices"] == []
+
+
+def test_declarative_payload_links_to_the_site_the_device_subscribed_on():
+    msg = {"title": "Новая запись", "body": "пт, 10:00", "url": "/s/alpha/owner", "tag": "new-1", "kind": "new"}
+    platform = push.declarative(msg, "http://localhost:3000", "alpha", badge=2)
+    assert platform == {
+        "web_push": 8030, "mutable": True, "kind": "new",
+        "notification": {"title": "Новая запись", "body": "пт, 10:00", "navigate": "http://localhost:3000/s/alpha/owner", "lang": "ru", "dir": "ltr", "tag": "new-1", "app_badge": 2},
+    }
+    own = push.declarative(msg, "https://book.alpha.ru", "alpha")  # a studio's own domain serves it at the root
+    assert own["notification"]["navigate"] == "https://book.alpha.ru/owner" and "app_badge" not in own["notification"]

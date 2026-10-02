@@ -3,7 +3,7 @@
 import { Theme } from "@astryxdesign/core";
 import { InternationalizationProvider } from "@astryxdesign/core/i18n";
 import ru from "@astryxdesign/core/locales/ru-RU.json";
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { api, studioApi } from "@/lib/api";
 import "@/lib/install"; // catches the browser install prompt as early as possible
@@ -36,7 +36,7 @@ function TenantData({ initial, base, children }: { initial: TenantPublic; base: 
     initialData: initial,
     staleTime: 30_000,
   });
-  const href = (path = "") => (base + path) || "/";
+  const href = (path = "") => (path ? base + path : `${base}/`); // home keeps the slash: it is inside the app scope
   return <StudioContext.Provider value={{ slug: initial.slug, tenant: data, base, href }}>{children}</StudioContext.Provider>;
 }
 
@@ -47,6 +47,14 @@ function ServiceWorker({ slug, base }: { slug: string; base: string }) {
     // the worker learns its studio and base path from its own URL, so one source serves every studio and domain
     navigator.serviceWorker.register(`${base}/sw.js?s=${slug}&b=${encodeURIComponent(base)}`, { scope: `${base}/` }).catch(() => undefined);
   }, [slug, base]);
+  // a push arrived while the app is open: refresh what is on screen (schedule, "my booking") at once
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    const onMessage = (e: MessageEvent) => { if ((e.data as { type?: string } | null)?.type === "push") qc.invalidateQueries(); };
+    navigator.serviceWorker.addEventListener("message", onMessage);
+    return () => navigator.serviceWorker.removeEventListener("message", onMessage);
+  }, [qc]);
   return null;
 }
 

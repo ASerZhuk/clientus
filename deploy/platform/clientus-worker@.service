@@ -1,0 +1,19 @@
+# /etc/systemd/system/clientus-worker@.service — sends push notifications from the outbox
+[Unit]
+Description=Clientus worker (%i)
+After=clientus-api@%i.service
+
+[Service]
+User=clientus
+WorkingDirectory=/srv/clientus/%i/current/api
+EnvironmentFile=/srv/clientus/%i/.env
+ExecStart=/srv/clientus/%i/venv/bin/python -m app.worker
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/clientus/%i/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

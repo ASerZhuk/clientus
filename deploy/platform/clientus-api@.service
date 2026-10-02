@@ -1,0 +1,20 @@
+# /etc/systemd/system/clientus-api@.service — instance = prod | test (see deploy/platform/README.md)
+[Unit]
+Description=Clientus API (%i)
+After=network.target
+
+[Service]
+User=clientus
+WorkingDirectory=/srv/clientus/%i/current/api
+EnvironmentFile=/srv/clientus/%i/.env
+# 2 workers are safe: every write is BEGIN IMMEDIATE + a UNIQUE index on occupancy cells
+ExecStart=/srv/clientus/%i/venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port ${API_PORT} --workers 2 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/clientus/%i/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

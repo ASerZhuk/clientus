@@ -1,6 +1,6 @@
 import { chromium } from "@playwright/test";
 const OUT = process.argv[2];
-const H = "http://localhost:3000", S = H + "/s/alexmotors";
+const H = process.env.BASE_URL || "http://localhost:3000", S = H + "/s/alexmotors";
 const OWNER = { email: "owner@alexmotors34.ru", password: process.env.OWNER_PW };
 const b = await chromium.launch({ executablePath: process.env.PW_CHROMIUM });
 const results = [];

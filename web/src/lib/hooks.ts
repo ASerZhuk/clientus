@@ -1,3 +1,4 @@
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 /** Makes the browser/OS Back button close an open sheet instead of leaving the page. */
@@ -33,6 +34,19 @@ export function useReducedMotion(): boolean {
     return () => mq.removeEventListener("change", on);
   }, []);
   return reduced;
+}
+
+/** One-shot `?do=…` request from the owner assistant: returns it once, then drops it from the URL. */
+export function useDoParam(ready = true): URLSearchParams | null {
+  const [req, setReq] = useState<URLSearchParams | null>(null);
+  const params = useSearchParams();
+  const want = params.get("do");
+  useEffect(() => {
+    if (!ready || !want) return;
+    setReq(new URLSearchParams(params.toString()));
+    history.replaceState(history.state, "", window.location.pathname);
+  }, [ready, want]); // eslint-disable-line react-hooks/exhaustive-deps
+  return req;
 }
 
 /**

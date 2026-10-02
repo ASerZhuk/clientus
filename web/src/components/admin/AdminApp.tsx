@@ -1,11 +1,10 @@
 "use client";
 
-import { ArrowUpRight, SignOut } from "@phosphor-icons/react";
+import { ArrowUpRight, MagnifyingGlass, SignOut, X } from "@phosphor-icons/react";
 import { Banner } from "@astryxdesign/core/Banner";
 import { Skeleton } from "@astryxdesign/core/Skeleton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { AppSheet } from "@/components/ui/AppSheet";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/Native";
 import { Button } from "@/components/ui/Pill";
@@ -57,7 +56,7 @@ function Tile({ label, value, note }: { label: string; value: string | number; n
   return <div className="kpi"><small>{label}</small><b>{value}</b>{note && <em>{note}</em>}</div>;
 }
 
-function TenantSheet({ slug, plans, onClose }: { slug: string | null; plans: AdminPlan[]; onClose: () => void }) {
+function TenantPanel({ slug, plans, onClose }: { slug: string | null; plans: AdminPlan[]; onClose: () => void }) {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin-tenant", slug], queryFn: () => api<AdminTenant>(`/api/admin/tenants/${slug}`), enabled: slug !== null });
   const t = q.data;
@@ -82,12 +81,17 @@ function TenantSheet({ slug, plans, onClose }: { slug: string | null; plans: Adm
   const removeDomain = useMutation({ mutationFn: (id: number) => api(`/api/admin/domains/${id}`, { method: "DELETE" }), onSuccess: refresh, onError: fail });
   const impersonate = useMutation({ mutationFn: () => api(`/api/admin/tenants/${slug}/impersonate`, { method: "POST" }), onSuccess: () => window.open(`/s/${slug}/owner`, "_blank"), onError: fail });
 
+  if (slug === null) return <aside className="adm-detail adm-empty" aria-label="Студия">Выберите студию в таблице, чтобы управлять пакетом, владельцем и доменами.</aside>;
   return (
-    <AppSheet isOpen={slug !== null} onClose={onClose} label="Студия" title={t?.name ?? "Студия"}>
+    <aside className="adm-detail stack" aria-label="Студия">
+      <div className="row-between">
+        <h2 className="adm-detail-title">{t?.name ?? "Студия"}</h2>
+        <Button label="Закрыть" size="sm" variant="ghost" icon={<X />} onClick={onClose} />
+      </div>
       {q.isPending && <Skeleton height={200} />}
       {t && (
         <>
-          <p className="muted" style={{ margin: 0 }}>{t.slug} · {TYPE[t.business_type] ?? t.business_type} · <StateDot state={t.state} /></p>
+          <p className="muted row" style={{ margin: 0, fontSize: 14, flexWrap: "wrap", gap: 6 }}>{t.slug} · {TYPE[t.business_type] ?? t.business_type} · <StateDot state={t.state} /></p>
           {error && <Banner status="error" title={error} />}
 
           <section className="panel stack" aria-label="Тариф">
@@ -152,22 +156,24 @@ function TenantSheet({ slug, plans, onClose }: { slug: string | null; plans: Adm
           )}
         </>
       )}
-    </AppSheet>
+    </aside>
   );
 }
 
 function Dashboard({ me, onLogout }: { me: Me; onLogout: () => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
   const q = useQuery({ queryKey: ["admin-overview"], queryFn: () => api<AdminOverview>("/api/admin/overview"), refetchInterval: 60_000 });
   const d = q.data;
-  const rows = (d?.tenants ?? []).filter((t) => filter === "all" || t.state === filter);
+  const needle = search.trim().toLowerCase();
+  const rows = (d?.tenants ?? []).filter((t) => (filter === "all" || t.state === filter) && (!needle || [t.name, t.slug, ...t.owners, ...t.domains.map((x) => x.host)].some((v) => v.toLowerCase().includes(needle))));
   return (
-    <main className="page stack" style={{ gap: 18, paddingBlock: 24 }}>
-      <div className="row-between">
-        <div><h1 className="owner-title" style={{ margin: 0 }}>Студии</h1><p className="owner-sub" style={{ marginTop: 4 }}>{me.email}</p></div>
+    <main className="adm">
+      <header className="adm-head">
+        <div><h1 className="adm-title">Студии</h1><p className="muted" style={{ margin: "2px 0 0", fontSize: 14 }}>Оператор: {me.email}</p></div>
         <Button label="Выйти" size="sm" variant="secondary" icon={<SignOut />} onClick={onLogout} />
-      </div>
+      </header>
       {q.isError && <Banner status="error" title="Не удалось загрузить" description={(q.error as ApiError).message} />}
       <div className="kpis" aria-busy={q.isPending}>
         <Tile label="Всего студий" value={d?.tenants_total ?? "—"} />
@@ -175,27 +181,47 @@ function Dashboard({ me, onLogout }: { me: Me; onLogout: () => void }) {
         <Tile label="Записей за 30 дней" value={d?.bookings_30d ?? "—"} note="без демо" />
         <Tile label="Продано на" value={d ? formatMoney(d.sales_total_minor) : "—"} note="по цене пакетов боевых студий" />
       </div>
-      <div className="chips" role="group" aria-label="Фильтр">
-        {[["all", "Все"], ["active", "Боевые"], ["preview", "Образцы"], ["suspended", "Приостановлены"], ["disabled", "Отключены"]].map(([k, label]) => (
-          <button key={k} type="button" className="chip-btn" aria-pressed={filter === k} onClick={() => setFilter(k)}>{label}{d && k !== "all" ? ` · ${d.by_state[k] ?? 0}` : ""}</button>
-        ))}
+      <div className="adm-main">
+        <section className="stack" aria-label="Список студий" style={{ minWidth: 0 }}>
+          <div className="adm-toolbar">
+            <div className="chips" role="group" aria-label="Фильтр">
+              {[["all", "Все"], ["active", "Боевые"], ["preview", "Образцы"], ["suspended", "Приостановлены"], ["disabled", "Отключены"]].map(([k, label]) => (
+                <button key={k} type="button" className="chip-btn" aria-pressed={filter === k} onClick={() => setFilter(k)}>{label}{d && k !== "all" ? ` · ${d.by_state[k] ?? 0}` : ""}</button>
+              ))}
+            </div>
+            <label className="adm-search">
+              <MagnifyingGlass size={16} aria-hidden />
+              <input type="search" aria-label="Поиск студии" placeholder="Название, slug, почта, домен" value={search} onChange={(e) => setSearch(e.target.value)} />
+            </label>
+          </div>
+          {q.isPending && <Skeleton height={320} />}
+          {d && (
+            <div className="adm-table-wrap">
+              <table className="adm-table">
+                <thead>
+                  <tr><th>Студия</th><th>Тип</th><th>Пакет</th><th>Состояние</th><th>Владелец</th><th>Домен</th><th className="num">Записей / мес</th><th className="num">Последняя запись</th></tr>
+                </thead>
+                <tbody>
+                  {rows.map((t) => (
+                    <tr key={t.slug} data-selected={open === t.slug} onClick={() => setOpen(t.slug)}>
+                      <td><button type="button" className="adm-name" onClick={(e) => { e.stopPropagation(); setOpen(t.slug); }}>{t.name}</button><span className="adm-sub">{t.slug}</span></td>
+                      <td>{TYPE[t.business_type] ?? t.business_type}</td>
+                      <td>{t.plan_label}</td>
+                      <td><StateDot state={t.state} /></td>
+                      <td>{t.owners[0] ?? <span className="muted">нет</span>}</td>
+                      <td>{t.domains.find((x) => x.status === "active")?.host ?? (t.domains.length ? <span className="muted">ждёт DNS</span> : <span className="muted">—</span>)}</td>
+                      <td className="num">{t.usage.bookings_month}</td>
+                      <td className="num">{fmtDate(t.last_booking_at)}</td>
+                    </tr>
+                  ))}
+                  {rows.length === 0 && <tr><td colSpan={8} className="muted" style={{ textAlign: "center", padding: 32 }}>Ничего не найдено. Измените фильтр или запрос.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+        <TenantPanel slug={open} plans={me.plans} onClose={() => setOpen(null)} />
       </div>
-      {q.isPending && <Skeleton height={200} />}
-      {d && rows.length === 0 && <p className="muted">Студий с таким статусом нет.</p>}
-      <div className="svc-panel">
-        {rows.map((t) => (
-          <button key={t.slug} type="button" className="svc-row" onClick={() => setOpen(t.slug)}>
-            <span className="grow">
-              <div className="name">{t.name}</div>
-              <div className="meta">{t.slug} · {TYPE[t.business_type] ?? t.business_type} · {t.plan_label}{t.domains.some((x) => x.status === "active") ? " · свой домен" : ""}</div>
-              <div className="meta"><StateDot state={t.state} /></div>
-            </span>
-            <span className="side"><div className="price">{t.usage.bookings_month}</div><div className="choose">записей / мес</div></span>
-            <ArrowUpRight size={22} aria-hidden />
-          </button>
-        ))}
-      </div>
-      <TenantSheet slug={open} plans={me.plans} onClose={() => setOpen(null)} />
     </main>
   );
 }

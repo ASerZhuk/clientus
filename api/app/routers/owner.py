@@ -1,9 +1,11 @@
 """Owner cabinet API. Every route except login depends on owner_dep: session cookie ->
 server-side session -> membership for the slug's tenant -> CSRF token on unsafe methods."""
+import logging
 import secrets
 from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, Response, UploadFile
+from pydantic import ValidationError
 from sqlalchemy import delete, func, select
 
 from .. import db as database
@@ -47,12 +49,13 @@ from ..schemas import (
 )
 from ..profiles import get_profile
 from ..security import new_token, sha256_hex, verify_password
-from ..services import assistant, media, push, stats, subscription
+from ..services import assistant, llm, media, push, stats, subscription
 from ..services import booking as bk
 from ..services.slots import compute_slots, service_resources
-from ..timeutil import day_bounds, local_date, now_min, tz_of
+from ..timeutil import day_bounds, local_date, local_to_min, now_min, tz_of
 from ..views import booking_owner_view, exceptions_view, public_tenant
 
+log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/s/{slug}/owner")
 
 
@@ -588,15 +591,92 @@ def gallery_delete(photo_id: int, ctx: OwnerCtx = Depends(owner_dep)) -> None:
 
 # --------------------------------------------------------------- push + helper
 @router.post("/push", status_code=204)
-def owner_push(body: PushSubscriptionIn, ctx: OwnerCtx = Depends(owner_dep)) -> None:
+def owner_push(body: PushSubscriptionIn, request: Request, ctx: OwnerCtx = Depends(owner_dep)) -> None:
     if not push.vapid_configured():
         raise HTTPException(503, {"code": "push_not_configured"})
+    device, origin = push.device_label(request.headers.get("user-agent")), push.request_origin(request.headers)
     with database.write_session(ctx.tenant.id) as db:
         existing = db.scalar(select(PushSubscription).where(PushSubscription.audience == "owner", PushSubscription.endpoint == body.endpoint))
         if existing:
-            existing.p256dh, existing.auth, existing.disabled_at, existing.user_id = body.keys.p256dh, body.keys.auth, None, ctx.user_id
+            existing.p256dh, existing.auth, existing.disabled_at, existing.user_id, existing.device, existing.failure_count, existing.origin = body.keys.p256dh, body.keys.auth, None, ctx.user_id, device, 0, origin
         else:
-            db.add(PushSubscription(tenant_id=ctx.tenant.id, audience="owner", user_id=ctx.user_id, endpoint=body.endpoint, p256dh=body.keys.p256dh, auth=body.keys.auth))
+            db.add(PushSubscription(tenant_id=ctx.tenant.id, audience="owner", user_id=ctx.user_id, endpoint=body.endpoint, p256dh=body.keys.p256dh, auth=body.keys.auth, device=device, origin=origin))
+
+
+@router.get("/push/devices")
+def owner_push_devices(response: Response, endpoint: str = Query(default=""), ctx: OwnerCtx = Depends(owner_dep)) -> dict:
+    """Where this owner's notifications go, with delivery health, so "it does not arrive" can be answered."""
+    _no_store(response)
+    with database.read_session(ctx.tenant.id) as db:
+        rows = db.scalars(select(PushSubscription).where(PushSubscription.audience == "owner", PushSubscription.user_id == ctx.user_id, PushSubscription.disabled_at.is_(None)).order_by(PushSubscription.created_at.desc()))
+        return {"devices": [
+            {"id": s.id, "device": s.device or "Устройство", "created_at": s.created_at, "last_success_at": s.last_success_at,
+             "failure_count": s.failure_count, "last_error": s.last_error, "this_device": bool(endpoint) and s.endpoint == endpoint}
+            for s in rows
+        ]}
+
+
+@router.delete("/push/devices/{sub_id}", status_code=204)
+def owner_push_device_off(sub_id: int, ctx: OwnerCtx = Depends(owner_dep)) -> None:
+    with database.write_session(ctx.tenant.id) as db:
+        sub = db.scalar(select(PushSubscription).where(PushSubscription.id == sub_id, PushSubscription.audience == "owner", PushSubscription.user_id == ctx.user_id))
+        if not sub:
+            raise HTTPException(404, {"code": "not_found"})
+        db.delete(sub)
+
+
+@router.post("/seen")
+def owner_seen(ctx: OwnerCtx = Depends(owner_dep)) -> dict:
+    """The owner opened the schedule: new bookings are seen, the app icon badge resets."""
+    with database.write_session() as db:
+        m = db.scalar(select(Membership).where(Membership.user_id == ctx.user_id, Membership.tenant_id == ctx.tenant.id))
+        if m:
+            m.seen_at = now_s()
+    return {"badge": 0}
+
+
+@router.post("/push/test")
+def owner_push_test(ctx: OwnerCtx = Depends(owner_dep)) -> dict:
+    """Send a test notification to this owner's devices right now: the quickest way to see that push works end to end."""
+    if not push.vapid_configured():
+        raise HTTPException(503, {"code": "push_not_configured"})
+    with database.read_session(ctx.tenant.id) as db:
+        subs = [
+            ({"endpoint": s.endpoint, "keys": {"p256dh": s.p256dh, "auth": s.auth}}, s.id, s.origin)
+            for s in db.scalars(select(PushSubscription).where(PushSubscription.audience == "owner", PushSubscription.user_id == ctx.user_id, PushSubscription.disabled_at.is_(None)))
+        ]
+    if not subs:
+        raise HTTPException(409, {"code": "no_push_subscription"})
+    message = {"title": "Уведомления работают", "body": "Так будут приходить новые записи и отмены.", "url": f"/s/{ctx.tenant.slug}/owner", "tag": "test", "kind": "test"}
+    sent, gone, results = 0, [], {}
+    for info, sub_id, origin in subs:
+        try:
+            push.real_sender(info, push.declarative(message, origin, ctx.tenant.slug))
+            sent += 1
+            results[sub_id] = None
+        except push.PushGone:
+            gone.append(sub_id)
+            results[sub_id] = "subscription gone (404/410)"
+        except Exception as exc:  # noqa: BLE001 - report, never crash the cabinet
+            log.warning("test push failed: %s", exc)
+            results[sub_id] = str(exc)
+    push.record_delivery(results)
+    if gone:
+        with database.write_session(ctx.tenant.id) as db:
+            for sub in db.scalars(select(PushSubscription).where(PushSubscription.id.in_(gone))):
+                sub.disabled_at = now_s()
+    if not sent:
+        raise HTTPException(502, {"code": "push_failed"})
+    return {"sent": sent}
+
+
+@router.get("/push")
+def owner_push_status(response: Response, endpoint: str = Query(min_length=10), ctx: OwnerCtx = Depends(owner_dep)) -> dict:
+    """Are this owner's notifications on for this device? The same device may also hold a client's reminder."""
+    _no_store(response)
+    with database.read_session(ctx.tenant.id) as db:
+        sub = db.scalar(select(PushSubscription.id).where(PushSubscription.audience == "owner", PushSubscription.user_id == ctx.user_id, PushSubscription.endpoint == endpoint, PushSubscription.disabled_at.is_(None)))
+    return {"on": sub is not None}
 
 
 @router.delete("/push", status_code=204)
@@ -609,10 +689,143 @@ def owner_push_off(endpoint: str = Query(min_length=10), ctx: OwnerCtx = Depends
 @router.post("/assistant")
 def owner_assistant(body: AssistantIn, response: Response, ctx: OwnerCtx = Depends(owner_dep)) -> dict:
     _no_store(response)
+    history = [h.model_dump() for h in body.history]
     with database.read_session(ctx.tenant.id) as db:
         settings = db.scalar(select(TenantSettings))
         reads = assistant.OwnerReads(db, settings, now_min())
-        return assistant.answer("owner", body.text, body.context, reads, [h.model_dump() for h in body.history]).as_dict()
+        want = not body.context and llm.enabled() and assistant.wants_change(body.text, history)
+        if not want:
+            return assistant.answer("owner", body.text, body.context, reads, history).as_dict()
+        command_ctx = assistant.command_context(reads)
+        fallback = assistant.owner_command(body.text, reads)
+        currency, tz = settings.currency, tz_of(settings.timezone)
+    # the model call runs outside the session: no lock is held while waiting for it
+    cmd = llm.command(command_ctx, body.text, history)
+    if cmd is None or cmd.get("action") in (None, "none"):
+        if cmd is None and fallback:
+            return fallback.as_dict()
+        with database.read_session(ctx.tenant.id) as db:
+            reads = assistant.OwnerReads(db, db.scalar(select(TenantSettings)), now_min())
+            return assistant.answer("owner", body.text, None, reads, history).as_dict()
+    return _run_command(cmd, ctx, currency, tz)
+
+
+# ------------------------------------------------------------ assistant commands
+# The model only fills a command; every change goes through the same endpoint functions
+# (and the same validation) as the cabinet forms.
+COMMAND_ERRORS = {
+    "slot_unavailable": "это время уже занято", "too_soon": "это время слишком близко", "in_the_past": "это время уже прошло",
+    "too_far": "на такую дату запись ещё не открыта", "outside_working_hours": "студия в это время не работает",
+    "time_not_aligned": "время должно быть кратно шагу записи", "car_required": "нужен автомобиль клиента",
+    "resource_limit": "больше мест добавить нельзя", "plan_limit_resources": "достигнут лимит тарифа",
+    "plan_limit_bookings": "достигнут лимит записей", "close_before_open": "закрытие должно быть позже открытия",
+    "service_not_found": "услуга не найдена", "bad_date": "неверная дата", "bad_exception_hours": "неверные часы особого дня",
+}
+REQUIRED = {
+    "add_service": ("name", "price", "duration_min"), "update_service": ("service_id",), "hide_service": ("service_id",),
+    "set_hours": ("days",), "special_day": ("date",), "add_resource": ("name",),
+    "add_booking": ("service_id", "date", "time", "client_name", "phone"),
+}
+FIELD_NAMES = {"name": "название", "price": "цену", "duration_min": "длительность", "service_id": "услугу", "days": "дни и часы",
+               "date": "дату", "time": "время", "client_name": "имя клиента", "phone": "телефон клиента"}
+
+
+def _num(v) -> float | None:
+    try:
+        return float(str(v).replace(",", ".").replace(" ", "")) if v not in (None, "") else None
+    except ValueError:
+        return None
+
+
+def _hhmm(v, step: int = 15) -> int | None:
+    try:
+        h, m = str(v).split(":")[:2]
+        return round((int(h) * 60 + int(m)) / step) * step
+    except (ValueError, AttributeError):
+        return None
+
+
+def _reply(text: str, to: str | None = None) -> dict:
+    out: dict = {"status": "answered", "text": text, "intent": "command"}
+    if to:
+        out["action"] = {"type": "done", "to": to}
+    return out
+
+
+def _run_command(cmd: dict, ctx: OwnerCtx, currency: str, tz) -> dict:
+    act = cmd.get("action")
+    if act not in REQUIRED:
+        return _reply("Не понял, что изменить. Напишите, например: «добавь услугу замена масла 1500 ₽ 20 минут».")
+    missing = [f for f in REQUIRED[act] if cmd.get(f) in (None, "", [])]
+    if missing:
+        ask = str(cmd.get("reply") or "").strip()
+        return {"status": "clarify", "intent": "command", "text": ask if ask.endswith("?") else f"Уточните {', '.join(FIELD_NAMES.get(f, f) for f in missing)}?"}
+    money = lambda rub: assistant.money(round(rub * 100), currency)  # noqa: E731
+    try:
+        if act == "add_service":
+            price, dur = _num(cmd["price"]), _num(cmd["duration_min"])
+            if price is None or not dur:
+                return _reply("Уточните цену и длительность числами?")
+            v = owner_service_create(ServiceIn(name=str(cmd["name"])[:120], price_minor=round(price * 100), duration_min=int(dur)), ctx)
+            return _reply(f"Готово: добавил услугу «{v['name']}» — {money(price)}, {assistant._duration(int(dur))}.", "/owner/services")
+        if act in ("update_service", "hide_service"):
+            with database.read_session(ctx.tenant.id) as db:
+                svc = db.get(Service, int(cmd["service_id"]))
+                cur = _service_view(db, svc) if svc else None
+            if not cur:
+                return _reply("Такой услуги нет. Проверьте название.")
+            if act == "hide_service":
+                owner_service_delete(cur["id"], ctx)
+                return _reply(f"Готово: услуга «{cur['name']}» скрыта, клиенты больше не смогут на неё записаться.", "/owner/services")
+            price, dur = _num(cmd.get("price")), _num(cmd.get("duration_min"))
+            body = ServiceIn(
+                name=str(cmd.get("name") or cur["name"])[:120], description=cur["description"], buffer_min=cur["buffer_min"], keywords=cur["keywords"], is_active=True,
+                price_minor=round(price * 100) if price is not None else cur["price_minor"], duration_min=int(dur) if dur else cur["duration_min"],
+            )
+            v = owner_service_update(cur["id"], body, ctx)
+            return _reply(f"Готово: «{v['name']}» — {assistant.money(v['price_minor'], currency)}, {assistant._duration(v['duration_min'])}.", "/owner/services")
+        if act in ("set_hours", "special_day"):
+            current = owner_settings(Response(), ctx)
+            days = {d["weekday"]: dict(d) for d in current["hours_edit"]}
+            exc = {e["date"]: dict(e) for e in current["exceptions"]}
+            if act == "set_hours":
+                for d in cmd["days"] if isinstance(cmd["days"], list) else []:
+                    wd = int(_num(d.get("weekday")) or 0) if isinstance(d, dict) and _num(d.get("weekday")) is not None else None
+                    if wd not in days:
+                        continue
+                    closed = bool(d.get("closed"))
+                    o, c = _hhmm(d.get("open")), _hhmm(d.get("close"))
+                    days[wd].update(is_closed=closed, **({"open_min": o} if o is not None else {}), **({"close_min": c} if c else {}))
+            else:
+                closed = cmd.get("closed") is not False and not (cmd.get("open") and cmd.get("close"))
+                exc[str(cmd["date"])] = {"date": str(cmd["date"]), "is_closed": closed, "open_min": None if closed else _hhmm(cmd.get("open")),
+                                         "close_min": None if closed else _hhmm(cmd.get("close")), "note": str(cmd.get("note") or "")[:120]}
+            owner_hours(HoursIn(days=list(days.values()), exceptions=sorted(exc.values(), key=lambda e: e["date"])), ctx)
+            if act == "special_day":
+                e = exc[str(cmd["date"])]
+                when = "выходной" if e["is_closed"] else f"{e['open_min'] // 60:02d}:{e['open_min'] % 60:02d}–{e['close_min'] // 60:02d}:{e['close_min'] % 60:02d}"
+                return _reply(f"Готово: {date.fromisoformat(e['date']):%d.%m} — {when}.", "/owner/studio?do=hours")
+            lines = [f"{assistant.WEEKDAYS_SHORT[d['weekday']]}: " + ("выходной" if d["is_closed"] else f"{d['open_min'] // 60:02d}:{d['open_min'] % 60:02d}–{d['close_min'] // 60:02d}:{d['close_min'] % 60:02d}") for d in days.values()]
+            return _reply("Готово, график обновлён:\n" + "\n".join(lines), "/owner/studio?do=hours")
+        if act == "add_resource":
+            v = owner_resource_create(ResourceIn(name=str(cmd["name"])[:80]), ctx)
+            return _reply(f"Готово: добавил «{v['name']}». Он выполняет все услуги — это можно поменять в карточке услуги.", "/owner/services")
+        if act == "add_booking":
+            minute = _hhmm(cmd["time"], step=1)
+            if minute is None:
+                return _reply("Уточните время в формате ЧЧ:ММ?")
+            start = local_to_min(date.fromisoformat(str(cmd["date"])), minute, tz)
+            v = owner_create_booking(OwnerBookingIn(
+                service_id=int(cmd["service_id"]), start_min=start, name=str(cmd["client_name"])[:80], phone=str(cmd["phone"]),
+                car=str(cmd.get("car") or "")[:80], plate=str(cmd.get("plate") or "")[:16],
+            ), ctx)
+            return _reply(f"Готово: записал {v['client_name']} на {assistant.when_text(v['start_min'], tz, local_date(now_min(), tz))} — {v['service_name']} ({v['post_name']}).", "/owner")
+    except HTTPException as exc:
+        detail = exc.detail if isinstance(exc.detail, dict) else {}
+        return _reply(f"Не получилось: {COMMAND_ERRORS.get(detail.get('code', ''), 'проверьте данные')}.")
+    except (ValidationError, ValueError, TypeError):
+        return _reply("Не получилось: проверьте значения — цену, длительность, дату, время и телефон.")
+    return _reply("Не понял команду.")
 
 
 @router.get("/assistant/examples")

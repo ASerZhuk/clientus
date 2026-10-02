@@ -13,6 +13,7 @@ import { AppSheet } from "@/components/ui/AppSheet";
 import { Input } from "@/components/ui/Input";
 import { NativeField } from "@/components/ui/Native";
 import { api, ApiError, ownerApi } from "@/lib/api";
+import { useDoParam } from "@/lib/hooks";
 import { WEEKDAYS_SHORT, formatDurationShort, formatMoney, hhmmToMin, minToHhmm, toMajor, toMinor } from "@/lib/format";
 import { fieldErrors, serviceSchema } from "@/lib/schemas";
 import type { DayEdit, ExceptionEdit, OwnerCatalog, OwnerResource, OwnerService } from "@/lib/types";
@@ -213,6 +214,13 @@ export function ServicesEditor() {
     onSuccess: () => { setNewName(""); qc.invalidateQueries({ queryKey: ["owner-services", slug] }); },
   });
   const atLimit = tenant.profile.type === "beauty_master";
+  const req = useDoParam(Boolean(q.data));
+  useEffect(() => {
+    const what = req?.get("do");
+    if (what === "new-service") setTarget("new");
+    else if (what === "edit-service") { const s = q.data?.services.find((x) => x.id === Number(req!.get("id"))); if (s) setTarget(s); }
+    else if (what === "new-resource") { const el = document.getElementById("new-resource"); el?.scrollIntoView({ block: "center" }); el?.querySelector("input")?.focus(); }
+  }, [req]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="page stack" style={{ gap: 18 }}>
       <div className="row-between"><h1 className="owner-title" style={{ marginTop: 24 }}>Услуги</h1><Button label="Добавить" icon={<Plus weight="bold" />} variant="primary" size="sm" onClick={() => setTarget("new")} /></div>
@@ -233,7 +241,7 @@ export function ServicesEditor() {
       <h2 className="section-title" style={{ marginTop: 18 }}>{vocab("resource_section")}</h2>
       {q.data?.resources.map((r) => <ResourceCard key={`${r.id}-${r.name}-${r.description}-${r.is_active}-${r.photo_url}`} r={r} catalog={q.data} onSchedule={setScheduleFor} />)}
       {!atLimit && (
-        <div className="panel stack">
+        <div className="panel stack" id="new-resource">
           <Input label={vocab("resource_new")} value={newName} onChange={setNewName} placeholder={tenant.profile.kind === "person" ? "Имя мастера" : "Например: Подъёмник 2"} />
           <Button label="Добавить" variant="secondary" isDisabled={!newName.trim()} isLoading={add.isPending} onClick={() => add.mutate()} />
           {add.isError && <span className="error-text" role="alert">{(add.error as ApiError).message}</span>}

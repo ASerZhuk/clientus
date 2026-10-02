@@ -27,6 +27,8 @@ const MESSAGES: Record<string, string> = {
   unsupported_format: "Подходят только JPG, PNG и WebP.",
   file_too_large: "Файл слишком большой.",
   push_not_configured: "Уведомления на сервере пока не настроены.",
+  no_push_subscription: "Сначала включите уведомления на этом устройстве.",
+  push_failed: "Сервис уведомлений не принял сообщение. Выключите и снова включите уведомления.",
   resource_not_suitable: "Это место не подходит для услуги.",
   resource_limit: "У мастера одно рабочее место — добавить второго нельзя.",
   feature_disabled: "Эта возможность недоступна для вашего типа бизнеса.",
