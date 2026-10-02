@@ -5,7 +5,7 @@ import io
 import uuid
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageOps
 
 from ..config import get_settings
 
@@ -113,6 +113,51 @@ def _mark(size: int, name: str, accent: str, logo: Image.Image | None, padding: 
     return tile
 
 
+def _badge(size: int, name: str, logo: Image.Image | None) -> Image.Image:
+    """Android status-bar icon: only the alpha channel is shown, so a white silhouette on transparency."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    inner = int(size * 0.84)
+    mask = None
+    if logo is not None:
+        alpha = logo.getchannel("A")
+        see_through = sum(alpha.histogram()[:128]) / (alpha.width * alpha.height)
+        if see_through < 0.05:  # opaque logo: the emblem is whatever differs from the corner (background) colour
+            rgb = logo.convert("RGB")
+            diff = ImageChops.difference(rgb, Image.new("RGB", rgb.size, rgb.getpixel((0, 0)))).convert("L")
+            alpha = diff.point(lambda v: 255 if v > 48 else 0)
+        box = alpha.getbbox()
+        if box and (box[2] - box[0]) * (box[3] - box[1]) < alpha.width * alpha.height * 0.98:
+            mask = alpha.crop(box)
+    if mask is None:  # no usable logo: the first letter of the name
+        mask = Image.new("L", (size, size), 0)
+        draw = ImageDraw.Draw(mask)
+        letter = (name.strip()[:1] or "S").upper()
+        font = _font(int(inner * 0.9))
+        box = draw.textbbox((0, 0), letter, font=font)
+        draw.text(((size - (box[2] - box[0])) / 2 - box[0], (size - (box[3] - box[1])) / 2 - box[1]), letter, font=font, fill=255)
+        mask = mask.crop(mask.getbbox() or (0, 0, size, size))
+    scale = inner / max(mask.size)
+    mask = mask.resize((max(1, round(mask.width * scale)), max(1, round(mask.height * scale))), Image.LANCZOS)
+    white = Image.new("RGBA", mask.size, (255, 255, 255, 255))
+    white.putalpha(mask)
+    img.paste(white, ((size - mask.width) // 2, (size - mask.height) // 2), white)
+    return img
+
+
+def build_badge(slug: str, name: str, logo_rel: str | None) -> str:
+    logo = None
+    if logo_rel:
+        try:
+            logo = Image.open(safe_path(logo_rel)).convert("RGBA")
+        except Exception:
+            logo = None
+    rel = f"{slug}/pwa/badge-96.png"
+    full = safe_path(rel)
+    full.parent.mkdir(parents=True, exist_ok=True)
+    _badge(96, name, logo).save(full, "PNG", optimize=True)
+    return rel
+
+
 def build_pwa_assets(slug: str, name: str, accent: str, logo_rel: str | None) -> dict:
     """Icons, apple-touch-icon and iOS splash screens. Returns their media paths."""
     logo = None
@@ -134,6 +179,7 @@ def build_pwa_assets(slug: str, name: str, accent: str, logo_rel: str | None) ->
     out["icon512"] = save(f"{base}/icon-512.png", _mark(512, name, accent, logo, 0.16))
     out["maskable512"] = save(f"{base}/maskable-512.png", _mark(512, name, accent, logo, 0.28))
     out["appleTouch"] = save(f"{base}/apple-touch-icon.png", _mark(180, name, accent, logo, 0.16))
+    out["badge"] = build_badge(slug, name, logo_rel)
     for w, h, dw, dh, ratio in SPLASH_SIZES:
         img = Image.new("RGB", (w, h), (0, 0, 0))
         icon = _mark(int(min(w, h) * 0.28), name, accent, logo, 0.16)

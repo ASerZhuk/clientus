@@ -87,7 +87,7 @@ self.addEventListener("push", (event) => {
         body: data.body,
         tag: data.tag,
         icon: `/api/media/${slug}/pwa/icon-192.png`,
-        badge: `/api/media/${slug}/pwa/icon-192.png`,
+        badge: `/api/media/${slug}/pwa/badge-96.png`, // Android status bar: white silhouette on transparency
         data: { url: data.url ?? scope },
       }),
       // number on the app icon (Android, installed iPhone app); the cabinet clears it when the schedule is opened

@@ -53,6 +53,7 @@ fi
 # 3. database: snapshot, then migrations
 if [ -f data/app.db ]; then sqlite3 data/app.db ".backup 'backups/pre-deploy-$(date +%Y%m%d-%H%M%S).db'"; fi
 (cd "$NEW/api" && "$BASE/venv/bin/python" -m alembic upgrade head)
+(cd "$NEW/api" && "$BASE/venv/bin/python" -m app.cli pwa:badges) || echo "!! push badges not rebuilt"
 
 # 4. switch atomically and restart
 ln -sfn "$NEW" current.new && mv -T current.new current

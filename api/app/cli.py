@@ -289,6 +289,25 @@ def cmd_plan(args) -> int:
     return 0
 
 
+def cmd_badges(args) -> int:
+    """Status-bar push icons for every studio (run on each deploy: cheap, keeps old studios up to date)."""
+    from sqlalchemy import select
+
+    from . import db as database
+    from .models import Tenant, TenantSettings
+    from .services import media
+
+    with database.read_session() as db:
+        tenants = list(db.scalars(select(Tenant).order_by(Tenant.id)))
+    for t in tenants:
+        with database.read_session(t.id) as db:
+            s = db.scalar(select(TenantSettings))
+            if s:
+                media.build_badge(t.slug, s.name, s.logo_path)
+    print(f"✓ badges: {len(tenants)}")
+    return 0
+
+
 def cmd_list(args) -> int:
     from sqlalchemy import select
 
@@ -379,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("domain:remove"); s.add_argument("host"); s.set_defaults(fn=cmd_domain, action="remove")
     s = sub.add_parser("plan:set"); s.add_argument("slug"); s.add_argument("--plan"); s.add_argument("--trial-days", type=int); s.add_argument("--paid-days", type=int); s.add_argument("--suspend", action="store_true"); s.add_argument("--resume", action="store_true"); s.set_defaults(fn=cmd_plan)
     s = sub.add_parser("tenant:list"); s.set_defaults(fn=cmd_list)
+    s = sub.add_parser("pwa:badges"); s.set_defaults(fn=cmd_badges)
     s = sub.add_parser("db:migrate"); s.set_defaults(fn=lambda a: (_migrate(), print("✓ migrated"), 0)[2])
     s = sub.add_parser("db:seed"); s.set_defaults(fn=cmd_seed)
     s = sub.add_parser("vapid:generate"); s.add_argument("--out", default=str(get_settings().data_dir / "vapid_private.pem")); s.add_argument("--force", action="store_true"); s.set_defaults(fn=cmd_vapid)
