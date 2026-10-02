@@ -1,7 +1,7 @@
 "use client";
 
 import { IconButton } from "@/components/ui/Pill";
-import { ArrowUp } from "@phosphor-icons/react";
+import { ArrowUp, Sparkle, X } from "@phosphor-icons/react";
 import { BottomSheet } from "@astryxdesign/core/BottomSheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -82,21 +82,20 @@ export function AssistantSheet({ slug, audience, isOpen, onClose, autoAsk }: Pro
   return (
     <BottomSheet isOpen={isOpen} onOpenChange={(o) => !o && onClose()} label={audience === "owner" ? "Помощник владельца" : "Помощник"} height="tall">
       <div className="chat-shell">
+        <header className="chat-head">
+          <span className="chat-avatar" aria-hidden><Sparkle weight="fill" /></span>
+          <span className="grow">
+            <b>Помощник</b>
+            <small>{audience === "owner" ? "отвечает и выполняет команды" : "подберёт время и запишет"}</small>
+          </span>
+          <IconButton label="Закрыть" icon={<X />} variant="ghost" size="sm" onClick={onClose} />
+        </header>
         <div className="chat" aria-live="polite">
           <div className="bubble bot">
-            {audience === "owner" ? "Спросите про записи или скажите, что сделать. Например: «добавь услугу замена масла 1500 ₽ 20 минут», «в субботу выходной», «запиши Ивана на завтра в 10»." : "Помогу записаться. Напишите, что нужно сделать и когда удобно, — подберу свободное время."}
+            {audience === "owner" ? "Здравствуйте! Спросите про записи или скажите, что сделать — например, «добавь услугу замена масла 1500 ₽ 20 минут»." : "Здравствуйте! Напишите, что нужно сделать и когда удобно, — подберу свободное время."}
           </div>
-          {messages.length === 0 && (
-            <div className="chips chat-chips">
-              {(examples.data?.examples ?? []).map((e) => (
-                <button key={e} className="chip-btn" type="button" onClick={() => send(e)}>
-                  {e}
-                </button>
-              ))}
-            </div>
-          )}
           {messages.map((m, i) => (
-            <div key={i} className="stack" style={{ gap: 8, alignItems: m.role === "me" ? "flex-end" : "flex-start" }}>
+            <div key={i} className={`chat-msg ${m.role}`}>
               <div className={`bubble ${m.role}`}>{m.text}</div>
               {m.options && i === messages.length - 1 && (
                 <div className="chips chat-chips">
@@ -108,7 +107,7 @@ export function AssistantSheet({ slug, audience, isOpen, onClose, autoAsk }: Pro
                 </div>
               )}
               {m.action?.type === "done" && i === messages.length - 1 && (
-                <button className="chip-btn chat-link" type="button" onClick={() => navigateFromSheet(router.push, href((m.action as { to: string }).to))}>
+                <button className="chip-btn" type="button" onClick={() => navigateFromSheet(router.push, href((m.action as { to: string }).to))}>
                   Посмотреть
                 </button>
               )}
@@ -122,6 +121,15 @@ export function AssistantSheet({ slug, audience, isOpen, onClose, autoAsk }: Pro
           {ask.isPending && <div className="bubble bot typing" aria-label="Печатает"><i /><i /><i /></div>}
           <div ref={endRef} />
         </div>
+        {messages.length === 0 && (
+          <div className="chat-quick" role="group" aria-label="Быстрые вопросы">
+            {(examples.data?.examples ?? []).map((e) => (
+              <button key={e} className="chip-btn" type="button" onClick={() => send(e)}>
+                {e}
+              </button>
+            ))}
+          </div>
+        )}
         <form
           className="chat-composer"
           onSubmit={(e) => {
@@ -129,7 +137,7 @@ export function AssistantSheet({ slug, audience, isOpen, onClose, autoAsk }: Pro
             send(text);
           }}
         >
-          <input aria-label="Сообщение" value={text} onChange={(e) => setText(e.target.value)} placeholder={audience === "owner" ? "Например: добавь услугу" : "Например: развал в субботу утром"} enterKeyHint="send" />
+          <input aria-label="Сообщение" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} placeholder="Сообщение" enterKeyHint="send" />
           <IconButton label="Отправить" icon={<ArrowUp weight="bold" />} variant="primary" onClick={() => send(text)} isDisabled={!text.trim() || ask.isPending} />
         </form>
       </div>

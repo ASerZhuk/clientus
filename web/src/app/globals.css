@@ -208,13 +208,24 @@
 
   /* ---------- chat ---------- */
   .chat { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
-  /* assistant as a messenger: scrolling feed + composer pinned to the bottom of the sheet */
-  .chat-shell { display: flex; flex-direction: column; height: 72dvh; width: 100%; max-width: var(--page-max); margin-inline: auto; }
-  .chat-shell .chat { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px var(--page-gutter); }
+  /* assistant as a messenger: header, feed growing from the bottom, quick replies, composer at the very bottom */
+  .chat-shell { display: flex; flex-direction: column; height: 100%; min-height: 70dvh; width: 100%; max-width: var(--page-max); margin-inline: auto; }
+  .chat-head { display: flex; align-items: center; gap: 12px; padding: 4px var(--page-gutter) 12px; border-bottom: 1px solid var(--line); }
+  .chat-head b { display: block; font-size: 16px; }
+  .chat-head small { display: block; color: var(--muted); font-size: 13px; }
+  .chat-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--cream, #ede4d3); color: var(--on-cream, #1b1b1b); font-size: 20px; }
+  .chat-shell .chat { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px var(--page-gutter) 8px; gap: 8px; }
+  .chat-shell .chat > :first-child { margin-top: auto; }
+  .chat-msg { display: flex; flex-direction: column; gap: 8px; }
+  .chat-msg.me { align-items: flex-end; }
+  .chat-msg.bot { align-items: flex-start; }
+  .chat-shell .bubble { max-width: 82%; padding: 10px 14px; border-radius: 20px; font-size: 15.5px; }
   .chat-chips { gap: 8px; }
-  .chat-chips .chip-btn { padding: 9px 14px; font-size: 15px; font-weight: 500; }
-  .chat-composer { display: flex; align-items: center; gap: 8px; padding: 10px var(--page-gutter) calc(10px + var(--safe-b)); border-top: 1px solid var(--line); }
-  .chat-composer input { flex: 1; min-width: 0; min-height: 46px; padding: 0 18px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16); background: var(--tile); color: #fff; font: inherit; }
+  .chat-chips .chip-btn, .chat-msg > .chip-btn, .chat-quick .chip-btn { padding: 8px 14px; font-size: 14.5px; font-weight: 500; }
+  .chat-quick { display: flex; gap: 8px; overflow-x: auto; padding: 4px var(--page-gutter) 8px; scrollbar-width: none; }
+  .chat-quick .chip-btn { flex: none; white-space: nowrap; }
+  .chat-composer { display: flex; align-items: center; gap: 8px; padding: 8px var(--page-gutter) calc(8px + var(--safe-b)); border-top: 1px solid var(--line); }
+  .chat-composer input { flex: 1; min-width: 0; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.14); background: var(--tile); color: #fff; font: inherit; }
   .chat-composer input:focus-visible { outline: 2px solid var(--studio-accent, #4690ff); outline-offset: 1px; }
   .bubble.typing { display: inline-flex; gap: 5px; padding: 14px 16px; }
   .bubble.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: typing 1s infinite ease-in-out; }
