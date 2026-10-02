@@ -379,6 +379,8 @@ def owner_command(text: str, reads: OwnerReads) -> Reply | None:
         return go("/owner/studio?do=photos", "Открываю фото и логотип.")
     if _has(norm, ("адрес", "телефон", "название", "описани", "карт")):
         return go("/owner/studio?do=basics", "Открываю основные данные студии.")
+    if "парол" in norm:
+        return go("/owner/studio?do=password", "Открываю смену пароля.")
     if _has(norm, ("уведомлен", "пуш")):
         return go("/owner/studio?do=push", "Открываю настройки уведомлений.")
     services = _services_for_parsing(reads)

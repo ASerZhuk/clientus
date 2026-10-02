@@ -38,6 +38,7 @@ from ..schemas import (
     LoginIn,
     OfferIn,
     OwnerBookingIn,
+    PasswordChangeIn,
     PaymentIn,
     PushSubscriptionIn,
     RescheduleIn,
@@ -48,7 +49,7 @@ from ..schemas import (
     StatusIn,
 )
 from ..profiles import get_profile
-from ..security import new_token, sha256_hex, verify_password
+from ..security import hash_password, new_token, sha256_hex, verify_password
 from ..services import assistant, llm, media, push, stats, subscription
 from ..services import booking as bk
 from ..services.slots import compute_slots, service_resources
@@ -97,6 +98,19 @@ def logout(request: Request, response: Response, ctx: OwnerCtx = Depends(owner_d
         db.execute(delete(OwnerSession).where(OwnerSession.token_hash == sha256_hex(raw)))
     response.delete_cookie(SESSION_COOKIE, path=f"/api/s/{ctx.tenant.slug}/owner")
     response.headers["Clear-Site-Data"] = '"cache"'
+
+
+@router.post("/password", status_code=204)
+def change_password(body: PasswordChangeIn, request: Request, ctx: OwnerCtx = Depends(owner_dep)) -> None:
+    """Needs the current password; every other session of this owner is signed out."""
+    limit_request(request, ctx.tenant.id, "password", 5, 600)
+    with database.write_session() as db:
+        user = db.get(User, ctx.user_id)
+        if not user or not verify_password(body.current, user.password_hash):
+            raise HTTPException(400, {"code": "wrong_password"})
+        user.password_hash = hash_password(body.new)
+        keep = sha256_hex(request.cookies.get(SESSION_COOKIE, ""))
+        db.execute(delete(OwnerSession).where(OwnerSession.user_id == user.id, OwnerSession.token_hash != keep))
 
 
 @router.get("/me")
@@ -702,7 +716,7 @@ def owner_assistant(body: AssistantIn, response: Response, ctx: OwnerCtx = Depen
     # the model call runs outside the session: no lock is held while waiting for it
     cmd = llm.command(command_ctx, body.text, history)
     if cmd is None or cmd.get("action") in (None, "none"):
-        if cmd is None and fallback:
+        if fallback:  # no model answer, or not a data change (e.g. a password): open the matching form
             return fallback.as_dict()
         with database.read_session(ctx.tenant.id) as db:
             reads = assistant.OwnerReads(db, db.scalar(select(TenantSettings)), now_min())

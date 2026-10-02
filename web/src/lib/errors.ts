@@ -18,6 +18,7 @@ const MESSAGES: Record<string, string> = {
   booking_not_active: "Запись уже отменена или недоступна для изменения.",
   booking_token_required: "Нужна ссылка на запись.",
   invalid_credentials: "Неверная почта или пароль.",
+  wrong_password: "Текущий пароль указан неверно.",
   not_authenticated: "Войдите в кабинет.",
   no_membership: "У вас нет доступа к этой студии.",
   bad_csrf: "Сессия устарела. Обновите страницу.",
