@@ -68,7 +68,7 @@ export default function Landing() {
       </header>
 
       <main id="top">
-        <section className="cl-hero cl-wrap">
+        <section className="cl-hero-sec"><div className="cl-hero cl-wrap">
           <div className="cl-hero-copy">
             <h1>Онлайн-запись для автосервиса, мойки и салона</h1>
             <p className="cl-lead">Клиенты сами выбирают услугу и свободное время по ссылке. Вы видите все записи в кабинете на телефоне и получаете уведомление о каждой новой.</p>
@@ -79,7 +79,7 @@ export default function Landing() {
             <Phone src={S("c-book-3")} alt="Клиент выбирает время записи" priority />
             <Phone src={S("o-schedule")} alt="Расписание в кабинете владельца" priority />
           </div>
-        </section>
+        </div></section>
 
         <section id="client" className="cl-sec">
           <div className="cl-wrap">
@@ -92,7 +92,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="owner" className="cl-sec">
+        <section id="owner" className="cl-sec cl-bg cl-bg-owner">
           <div className="cl-wrap">
             <div className="cl-head"><h2>А так это видите вы</h2><p>Кабинет открывается с иконки на телефоне. Уведомление о новой записи приходит сразу.</p></div>
           </div>
@@ -126,13 +126,13 @@ export default function Landing() {
           <div className="cl-faq">{FAQ.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div>
         </section>
 
-        <section id="form" className="cl-sec cl-wrap cl-form-grid">
+        <section id="form" className="cl-sec cl-bg cl-bg-form"><div className="cl-wrap cl-form-grid">
           <div className="cl-head">
             <h2>Подключим запись за день</h2>
             <p>Оставьте телефон — перезвоним, спросим про услуги и график и покажем, как будет выглядеть ваша страница. Платить — только если понравится.</p>
           </div>
           <LeadForm />
-        </section>
+        </div></section>
       </main>
 
       <footer className="cl-foot cl-wrap"><Logo size={20} /><span>© {new Date().getFullYear()} · онлайн-запись для сервиса и красоты</span></footer>

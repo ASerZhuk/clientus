@@ -28,6 +28,12 @@
   .cl-btn-sm { min-height: 40px; padding: 0 18px; font-size: 14.5px; }
   .cl-btn-block { width: 100%; }
 
+  /* photographic backgrounds: always under a dark scrim so text and screens stay readable */
+  .cl-hero-sec { background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.6) 55%, #000 100%), url("/landing/bg/hero.webp") 70% center / cover no-repeat; }
+  .cl-bg { background-repeat: no-repeat; background-size: cover; background-position: center; }
+  .cl-bg-owner { background-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.15) 22%, rgba(0, 0, 0, 0.15) 78%, #000 100%), url("/landing/bg/owner.webp"); }
+  .cl-bg-form { background-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.1) 30%, rgba(0, 0, 0, 0.35) 100%), url("/landing/bg/form.webp"); }
+
   /* hero */
   .cl-hero { display: grid; gap: 44px; padding-block: 48px 64px; }
   .cl-hero h1 { font-size: clamp(36px, 5.4vw, 64px); line-height: 1.04; font-weight: 750; letter-spacing: -0.035em; text-wrap: balance; max-width: 13ch; }
@@ -111,6 +117,7 @@
     .cl-rail { grid-auto-columns: 42%; }
   }
   @media (min-width: 1000px) {
+    .cl-hero-sec { background: linear-gradient(90deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0) 100%), linear-gradient(0deg, #000 0%, transparent 22%), url("/landing/bg/hero.webp") right center / cover no-repeat; }
     .cl-nav nav { display: flex; }
     .cl-nav .cl-btn { margin-left: 8px; }
     .cl-hero { grid-template-columns: 1.1fr 1fr; align-items: center; gap: 56px; padding-block: 80px 96px; }
