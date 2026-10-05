@@ -1,167 +1,128 @@
-/* clientall landing: warm paper, ink, one signal-orange accent. Swiss grid, editorial italic for emphasis, real UI instead of mood shots. */
+/* clientall landing: the app's own palette (black, dark tiles, cream pill buttons, Inter). Product first: real screens carry the page. */
 @layer app {
   .cl {
-    --paper: #f2efe8; --paper-2: #e9e5dc; --ink: #121212; --ink-2: #4f4b45; --rule: rgba(18, 18, 18, 0.16);
-    --accent: #ff5b1f; --sans: "Onest Variable", "Onest", system-ui, sans-serif; --serif: "Lora", Georgia, serif;
-    background: var(--paper); color: var(--ink); font-family: var(--sans); min-height: 100dvh; color-scheme: light; overflow-x: clip;
-    font-feature-settings: "ss01", "tnum" 0;
+    --bg: #000; --card: #0d0d0d; --tile: #151515; --line: rgba(255, 255, 255, 0.09); --line-2: rgba(255, 255, 255, 0.16);
+    --text: #fff; --muted: rgba(255, 255, 255, 0.62); --cream: #efe5d3; --on-cream: #17130d; --ok: #3ddc84;
+    background: var(--bg); color: var(--text); min-height: 100dvh; overflow-x: clip; font-family: var(--font-app);
   }
   .cl a { color: inherit; text-decoration: none; }
-  .cl h1, .cl h2, .cl h3, .cl p, .cl figure, .cl dl, .cl dd { margin: 0; }
-  .cl em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
-  .cl-wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: 20px; }
-  .cl-skip { position: absolute; left: -999px; top: 8px; z-index: 50; padding: 10px 14px; background: var(--ink); color: var(--paper) !important; }
-  .cl-skip:focus { left: 8px; }
-  .cl :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .cl h1, .cl h2, .cl p, .cl figure, .cl ul { margin: 0; }
+  .cl-wrap { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: 20px; }
+  .cl :focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
 
-  /* logo */
-  .cl-logo { display: inline-flex; align-items: center; gap: 0.32em; font-weight: 800; letter-spacing: -0.045em; line-height: 1; color: var(--ink); }
+  .cl-logo { display: inline-flex; align-items: center; gap: 0.3em; font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--text); }
 
   /* nav */
-  .cl-nav { position: sticky; top: 0; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule); }
+  .cl-nav { position: sticky; top: 0; z-index: 20; background: rgba(0, 0, 0, 0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
   .cl-nav-in { display: flex; align-items: center; gap: 28px; height: 64px; }
-  .cl-nav nav { display: none; gap: 24px; margin-left: auto; font-size: 15px; font-weight: 500; }
-  .cl-nav nav a { padding: 6px 0; border-bottom: 2px solid transparent; transition: border-color 0.2s; }
-  .cl-nav nav a:hover { border-color: var(--ink); }
+  .cl-nav nav { display: none; gap: 26px; margin-left: auto; font-size: 15px; color: var(--muted); }
+  .cl-nav nav a:hover { color: var(--text); }
   .cl-nav .cl-btn { margin-left: auto; }
 
-  /* buttons: flat, rectangular-ish, ink */
-  .cl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 0 26px; border-radius: 10px; border: 2px solid var(--ink);
-            background: var(--ink); color: var(--paper) !important; font: inherit; font-weight: 650; font-size: 17px; cursor: pointer; transition: background 0.18s, color 0.18s, transform 0.12s; touch-action: manipulation; }
-  .cl-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--ink) !important; }
-  .cl-btn:active { transform: translateY(1px); }
+  /* buttons: the app's cream pill */
+  .cl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 999px; border: 0;
+            background: var(--cream); color: var(--on-cream) !important; font: inherit; font-weight: 650; font-size: 16px; cursor: pointer; transition: opacity 0.15s, transform 0.12s; touch-action: manipulation; white-space: nowrap; }
+  .cl-btn:hover { opacity: 0.9; }
+  .cl-btn:active { transform: scale(0.98); }
   .cl-btn[disabled] { opacity: 0.55; cursor: progress; }
-  .cl-btn-sm { min-height: 42px; padding: 0 18px; font-size: 15px; }
-  .cl-btn-line { background: transparent; color: var(--ink) !important; }
+  .cl-btn-sm { min-height: 40px; padding: 0 18px; font-size: 14.5px; }
   .cl-btn-block { width: 100%; }
 
   /* hero */
-  .cl-hero { display: grid; gap: 40px; padding-block: 44px 64px; }
-  .cl-kicker { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
-  .cl-hero h1 { margin-top: 18px; font-size: clamp(40px, 6.2vw, 84px); line-height: 1; font-weight: 800; letter-spacing: -0.045em; text-wrap: balance; }
-  .cl-hero h1 em { display: block; margin-top: 0.06em; padding-bottom: 0.12em; line-height: 1.12; letter-spacing: -0.02em; white-space: nowrap; }
-  .cl-lead { margin-top: 28px; max-width: 34ch; font-size: clamp(18px, 1.7vw, 21px); line-height: 1.5; color: var(--ink-2); }
-  .cl-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; margin-top: 32px; }
-  .cl-cta-note { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+  .cl-hero { display: grid; gap: 44px; padding-block: 48px 64px; }
+  .cl-hero h1 { font-size: clamp(36px, 5.4vw, 64px); line-height: 1.04; font-weight: 750; letter-spacing: -0.035em; text-wrap: balance; max-width: 13ch; }
+  .cl-lead { margin-top: 20px !important; max-width: 46ch; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.55; color: var(--muted); }
+  .cl-hero-note { margin-top: 14px !important; font-size: 14px; color: var(--muted); }
+  .cl-hero-phones { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; max-width: 560px; justify-self: center; width: 100%; }
+  .cl-hero-phones .ph:last-child { margin-top: 48px; }
 
-  /* product mock (real UI, not a stock photo) */
-  .mk { position: relative; justify-self: center; width: min(100%, 360px); padding-bottom: 64px; }
-  .mk-phone { padding: 18px 16px 16px; border: 2px solid var(--ink); border-radius: 30px; background: #fbfaf6; box-shadow: 10px 10px 0 var(--ink); }
-  .mk-top { display: flex; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
-  .mk-top b { display: block; font-size: 16px; }
-  .mk-top small { color: var(--ink-2); font-size: 12.5px; }
-  .mk-ava { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: var(--paper); font-weight: 700; }
-  .mk-label { margin-top: 14px !important; font-size: 13.5px; font-weight: 600; }
-  .mk-days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 12px; }
-  .mk-days span { display: grid; justify-items: center; padding: 7px 0; border: 1.5px solid var(--rule); border-radius: 10px; font-weight: 700; font-size: 16px; }
-  .mk-days small { font-weight: 500; font-size: 11px; color: var(--ink-2); }
-  .mk-days .on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .mk-days .on small { color: rgba(242, 239, 232, 0.7); }
-  .mk-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
-  .mk-slots span { padding: 10px 0; text-align: center; border: 1.5px solid var(--rule); border-radius: 10px; font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; }
-  .mk-slots .busy { color: rgba(18, 18, 18, 0.35); background: repeating-linear-gradient(135deg, transparent 0 5px, rgba(18, 18, 18, 0.07) 5px 7px); text-decoration: line-through; }
-  .mk-slots .on { background: var(--accent); border-color: var(--accent); }
-  .mk-btn { margin-top: 14px; padding: 13px; border-radius: 12px; background: var(--ink); color: var(--paper); text-align: center; font-weight: 650; font-size: 14.5px; }
-  .mk-push { position: absolute; left: -18px; right: 30px; bottom: 0; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: var(--ink); color: var(--paper); font-size: 13px; line-height: 1.35; }
-  .mk-push svg { flex: none; background: var(--paper); border-radius: 6px; padding: 2px; }
-  .mk-push svg path { stroke: var(--ink); }
-  .mk-push b { display: block; font-size: 14px; }
+  /* quick form in the hero */
+  .cl-quick { display: grid; gap: 10px; margin-top: 28px; max-width: 560px; }
+  .cl-quick .cl-btn { min-height: 52px; }
+
+  /* phone frame: the screenshot itself, a thin bezel, nothing else */
+  .ph { position: relative; border-radius: 34px; padding: 7px; background: #1a1a1a; border: 1px solid var(--line-2); }
+  .ph img { display: block; width: 100%; height: auto; border-radius: 28px; }
 
   /* sections */
-  .cl-sec { padding-block: 56px; border-top: 2px solid var(--ink); }
-  .cl-head { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 6px 16px; margin-bottom: 30px; }
-  .cl-head h2 { font-size: clamp(32px, 5vw, 56px); line-height: 1; font-weight: 800; letter-spacing: -0.04em; }
-  .cl-head p { grid-column: 2; color: var(--ink-2); font-size: 17px; }
-  .cl-num { font-size: 14px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .cl-sec { padding-block: 64px; border-top: 1px solid var(--line); }
+  .cl-head { display: grid; gap: 10px; margin-bottom: 32px; max-width: 640px; }
+  .cl-head h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1.08; font-weight: 750; letter-spacing: -0.03em; text-wrap: balance; }
+  .cl-head p { color: var(--muted); font-size: 17px; line-height: 1.55; }
 
-  .cl-kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 14px; }
-  .cl-kind-img { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 6px; background: var(--paper-2); }
-  .cl-kind-img img { object-fit: cover; filter: saturate(0.92); }
-  .cl-kind figcaption { margin-top: 12px; font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
-  .cl-kind figcaption b { display: block; margin-bottom: 4px; font-size: 18px; color: var(--ink); letter-spacing: -0.02em; }
+  /* screens rail: swipe on phones, a row of four on desktop */
+  .cl-rail { display: grid; grid-auto-flow: column; grid-auto-columns: 68%; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; scrollbar-width: none; }
+  .cl-rail::-webkit-scrollbar { display: none; }
+  .cl-shot { scroll-snap-align: start; display: grid; gap: 14px; align-content: start; }
+  .cl-shot figcaption { font-size: 15px; line-height: 1.5; color: var(--muted); }
+  .cl-shot figcaption b { display: block; margin-bottom: 4px; color: var(--text); font-size: 17px; }
 
-  .cl-ba { display: grid; border-top: 1px solid var(--rule); }
-  .cl-ba-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--rule); font-size: 16px; line-height: 1.45; }
-  .cl-ba-row span:first-child { color: var(--ink-2); text-decoration: line-through; text-decoration-color: rgba(18, 18, 18, 0.3); }
-  .cl-ba-row span:last-child { font-weight: 600; }
-  .cl-ba-th span { text-decoration: none !important; font-size: 13px; font-weight: 700 !important; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2) !important; }
-  .cl-ba-th span:last-child { color: var(--accent) !important; }
+  .cl-kinds { list-style: none; padding: 0; display: grid; border-top: 1px solid var(--line); }
+  .cl-kinds li { display: grid; gap: 4px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .cl-kinds b { font-size: 19px; }
+  .cl-kinds span { color: var(--muted); line-height: 1.5; }
 
-  .cl-feat { display: grid; gap: 0; }
-  .cl-feat div { padding: 18px 0; border-top: 1px solid var(--rule); }
-  .cl-feat dt { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
-  .cl-feat dd { margin-top: 6px; color: var(--ink-2); font-size: 16px; line-height: 1.5; max-width: 46ch; }
+  .cl-plans { display: grid; gap: 12px; }
+  .cl-plan { display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; align-items: baseline; padding: 22px; border-radius: 26px; background: var(--tile); border: 1px solid var(--line); }
+  .cl-plan b { font-size: 20px; }
+  .cl-plan p { grid-column: 1 / -1; color: var(--muted); font-size: 15.5px; line-height: 1.5; }
+  .cl-price { grid-row: 1; grid-column: 2; font-size: 28px; font-weight: 750; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 
-  .cl-plans { display: grid; border-top: 1px solid var(--rule); }
-  .cl-plan { display: grid; grid-template-columns: 1fr auto; gap: 6px 20px; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--rule); }
-  .cl-plan b { font-size: 22px; letter-spacing: -0.02em; }
-  .cl-plan p { grid-column: 1 / -1; color: var(--ink-2); font-size: 15.5px; line-height: 1.5; max-width: 52ch; }
-  .cl-price { grid-row: 1; grid-column: 2; font-size: 30px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-  .cl-plan .cl-btn { grid-column: 1 / -1; justify-self: start; margin-top: 8px; }
-
-  .cl-faq { border-top: 1px solid var(--rule); }
-  .cl-faq details { border-bottom: 1px solid var(--rule); }
-  .cl-faq summary { list-style: none; display: flex; justify-content: space-between; gap: 16px; padding: 20px 0; font-size: 18px; font-weight: 650; cursor: pointer; }
+  .cl-faq { display: grid; gap: 10px; }
+  .cl-faq details { border-radius: 22px; background: var(--tile); border: 1px solid var(--line); }
+  .cl-faq summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 22px; font-size: 17px; font-weight: 600; cursor: pointer; }
   .cl-faq summary::-webkit-details-marker { display: none; }
-  .cl-faq summary::after { content: "+"; font-weight: 400; font-size: 26px; line-height: 0.8; transition: transform 0.2s; }
+  .cl-faq summary::after { content: "+"; font-size: 24px; font-weight: 400; color: var(--muted); transition: transform 0.2s; }
   .cl-faq details[open] summary::after { transform: rotate(45deg); }
-  .cl-faq p { padding: 0 0 20px; color: var(--ink-2); font-size: 16px; line-height: 1.6; max-width: 62ch; }
+  .cl-faq p { padding: 0 22px 18px; color: var(--muted); line-height: 1.6; max-width: 64ch; }
 
-  /* form block on the accent */
-  .cl-form-sec { background: var(--accent); padding-block: 56px; border-top: 2px solid var(--ink); }
-  .cl-form-grid { display: grid; gap: 30px; align-items: start; }
-  .cl-form-copy h2 { font-size: clamp(36px, 6vw, 68px); line-height: 0.98; font-weight: 800; letter-spacing: -0.045em; }
-  .cl-form-copy em { display: block; }
-  .cl-form-copy p { margin-top: 18px; max-width: 40ch; font-size: 18px; line-height: 1.5; }
-  .cl-card { padding: 22px; border: 2px solid var(--ink); border-radius: 16px; background: var(--paper); box-shadow: 8px 8px 0 var(--ink); }
+  /* forms */
+  .cl-form-grid { display: grid; gap: 8px; }
+  .cl-card { padding: 22px; border-radius: 26px; background: var(--card); border: 1px solid var(--line); }
   .cl-form { display: grid; gap: 16px; }
-  .cl-field { display: grid; gap: 7px; margin: 0; padding: 0; border: 0; min-width: 0; }
-  .cl-field > span, .cl-field legend { padding: 0; font-size: 14px; font-weight: 650; }
-  .cl-field input, .cl-field textarea { width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid rgba(18, 18, 18, 0.35); background: #fbfaf6; color: var(--ink);
-                                        font: inherit; font-size: 16px !important; resize: vertical; transition: border-color 0.15s, box-shadow 0.15s; }
-  .cl-field input::placeholder, .cl-field textarea::placeholder { color: rgba(18, 18, 18, 0.38); }
-  .cl-field input:focus, .cl-field textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(255, 91, 31, 0.35); }
-  .cl-field input[aria-invalid="true"] { border-color: #c4250c; }
-  .cl-field em, .cl-form-error { font-family: var(--sans); font-style: normal; color: #b0200a; font-size: 13.5px; font-weight: 500; }
+  .cl-field { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+  .cl-field > span, .cl-field legend { padding: 0; font-size: 14px; color: rgba(255, 255, 255, 0.78); }
+  .cl-field input, .cl-field textarea { width: 100%; min-height: 52px; padding: 12px 18px; border-radius: 16px; border: 1px solid var(--line-2); background: var(--tile); color: var(--text);
+                                        font: inherit; font-size: 16px !important; resize: vertical; transition: border-color 0.15s; }
+  .cl-field input::placeholder, .cl-field textarea::placeholder { color: rgba(255, 255, 255, 0.32); }
+  .cl-field input:focus, .cl-field textarea:focus { outline: none; border-color: var(--cream); }
+  .cl-field input[aria-invalid="true"] { border-color: #ff8a8a; }
+  .cl-field em, .cl-form-error { font-style: normal; color: #ff8a8a; font-size: 13.5px; }
   .cl-chips { display: flex; flex-wrap: wrap; gap: 8px; outline: none; }
-  .cl-chips button { min-height: 42px; padding: 0 15px; border-radius: 10px; border: 1.5px solid rgba(18, 18, 18, 0.35); background: transparent; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer; transition: background 0.15s; }
-  .cl-chips button:hover { background: var(--paper-2); }
-  .cl-chips button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); font-weight: 600; }
+  .cl-chips button { min-height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--tile); color: var(--text); font: inherit; font-size: 15px; cursor: pointer; }
+  .cl-chips button[aria-pressed="true"] { background: var(--cream); border-color: transparent; color: var(--on-cream); font-weight: 600; }
   .cl-two { display: grid; gap: 16px; }
   .cl-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  .cl-note { color: var(--ink-2); font-size: 12.5px; line-height: 1.45; }
-  .cl-done { display: grid; justify-items: start; gap: 10px; padding: 36px 26px; }
-  .cl-done svg { color: var(--accent); }
-  .cl-done h3 { font-size: 28px; letter-spacing: -0.03em; }
-  .cl-done p { color: var(--ink-2); }
+  .cl-note { color: rgba(255, 255, 255, 0.45); font-size: 12.5px; line-height: 1.45; }
+  .cl-done { display: grid; justify-items: start; gap: 10px; padding: 30px 24px; }
+  .cl-done svg { color: var(--ok); }
+  .cl-done h3 { margin: 0; font-size: 24px; }
+  .cl-done p { margin: 0; color: var(--muted); }
+  .cl-done-compact { margin-top: 28px; max-width: 560px; }
 
-  .cl-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 28px 40px; font-size: 14px; color: var(--ink-2); }
+  .cl-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 28px 40px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
 
-  @media (min-width: 720px) {
+  @media (min-width: 640px) {
     .cl-wrap { padding-inline: 32px; }
-    .cl-kinds { grid-template-columns: repeat(4, 1fr); }
-    .cl-feat { grid-template-columns: 1fr 1fr; column-gap: 40px; }
+    .cl-quick { grid-template-columns: 1fr 1fr auto; align-items: end; }
+    .cl-quick .cl-form-error { grid-column: 1 / -1; }
     .cl-two { grid-template-columns: 1fr 1fr; }
     .cl-card { padding: 30px; }
-    .cl-plan { grid-template-columns: 220px 1fr auto auto; padding: 26px 0; }
-    .cl-plan p { grid-column: 2; grid-row: 1; }
-    .cl-price { grid-column: 3; }
-    .cl-plan .cl-btn { grid-column: 4; grid-row: 1; margin: 0; }
+    .cl-rail { grid-auto-columns: 42%; }
   }
   @media (min-width: 1000px) {
     .cl-nav nav { display: flex; }
     .cl-nav .cl-btn { margin-left: 8px; }
-    .cl-hero { grid-template-columns: 7fr 5fr; align-items: center; padding-block: 72px 96px; }
-    .cl-sec { display: grid; grid-template-columns: 4fr 8fr; column-gap: 40px; padding-block: 80px; }
-    .cl-head { grid-template-columns: auto 1fr; align-content: start; margin: 0; position: sticky; top: 96px; }
-    .cl-head h2 { grid-column: 1 / -1; margin-top: 8px; }
-    .cl-head .cl-num { grid-column: 1 / -1; }
-    .cl-head p { grid-column: 1 / -1; margin-top: 12px; }
-    .cl-kinds { grid-template-columns: repeat(2, 1fr); gap: 28px 20px; }
-    .cl-form-sec { padding-block: 96px; }
-    .cl-form-grid { grid-template-columns: 5fr 6fr; gap: 64px; }
+    .cl-hero { grid-template-columns: 1.1fr 1fr; align-items: center; gap: 56px; padding-block: 80px 96px; }
+    .cl-sec { padding-block: 96px; }
+    .cl-rail { grid-auto-flow: initial; grid-template-columns: repeat(4, 1fr); overflow: visible; gap: 24px; }
+    .cl-kinds-sec, .cl-form-grid { display: grid; grid-template-columns: 5fr 7fr; column-gap: 48px; align-items: start; }
+    .cl-kinds-sec .cl-head, .cl-form-grid .cl-head { margin: 0; }
+    .cl-plans { grid-template-columns: repeat(3, 1fr); }
+    .cl-plan { grid-template-columns: 1fr; }
+    .cl-price { grid-row: auto; grid-column: auto; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .cl-btn, .cl-faq summary::after, .cl-nav nav a { transition: none; }
+    .cl-btn, .cl-faq summary::after { transition: none; }
   }
 }

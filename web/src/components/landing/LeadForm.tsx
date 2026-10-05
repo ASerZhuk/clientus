@@ -12,8 +12,9 @@ const KINDS = [
   { value: "other", label: "Другое" },
 ];
 
-/** Three required things only: name, phone, kind of business. The rest is optional. */
-export function LeadForm() {
+/** Full form: name, phone, kind of business (the rest optional). Compact (hero): name and phone in one row. */
+export function LeadForm({ compact = false }: { compact?: boolean }) {
+  const id = (k: string) => `lead${compact ? "-c" : ""}-${k}`;
   const [f, setF] = useState({ name: "", phone: "", kind: "", business: "", city: "", comment: "", website: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -25,10 +26,10 @@ export function LeadForm() {
     if (!f.name.trim()) next.name = "Как к вам обращаться?";
     const digits = f.phone.replace(/\D/g, "");
     if (digits.length < 10 || digits.length > 15) next.phone = "Нужен номер телефона, например +7 900 000-00-00";
-    if (!f.kind) next.kind = "Выберите вид бизнеса";
+    if (!f.kind && !compact) next.kind = "Выберите вид бизнеса";
     setErrors(next);
     if (Object.keys(next).length) {
-      document.getElementById(`lead-${Object.keys(next)[0]}`)?.focus();
+      document.getElementById(id(Object.keys(next)[0]))?.focus();
       return;
     }
     setState("sending");
@@ -43,28 +44,39 @@ export function LeadForm() {
 
   if (state === "done")
     return (
-      <div className="cl-card cl-done" role="status">
+      <div className={`cl-card cl-done${compact ? " cl-done-compact" : ""}`} role="status">
         <CheckCircle size={44} weight="fill" aria-hidden />
         <h3>Заявка отправлена</h3>
         <p>Спасибо, {f.name.trim()}! Перезвоним на {f.phone} в течение дня.</p>
       </div>
     );
 
+  if (compact)
+    return (
+      <form className="cl-quick" onSubmit={submit} noValidate aria-label="Быстрая заявка">
+        <label className="cl-field"><span>Имя</span><input id={id("name")} autoComplete="name" value={f.name} onChange={set("name")} aria-invalid={!!errors.name} placeholder="Андрей" /></label>
+        <label className="cl-field"><span>Телефон</span><input id={id("phone")} type="tel" inputMode="tel" autoComplete="tel" value={f.phone} onChange={set("phone")} aria-invalid={!!errors.phone} placeholder="+7 900 000-00-00" /></label>
+        <label className="cl-hp" aria-hidden>Сайт<input tabIndex={-1} autoComplete="off" value={f.website} onChange={set("website")} /></label>
+        <button type="submit" className="cl-btn" disabled={state === "sending"}>{state === "sending" ? "Отправляем…" : "Подключить"}</button>
+        {(errors.name || errors.phone || errors.form) && <em className="cl-form-error" role="alert">{errors.name || errors.phone || errors.form}</em>}
+      </form>
+    );
+
   return (
     <form className="cl-card cl-form" onSubmit={submit} noValidate>
       <label className="cl-field">
         <span>Имя *</span>
-        <input id="lead-name" autoComplete="name" value={f.name} onChange={set("name")} aria-invalid={!!errors.name} placeholder="Андрей" />
+        <input id={id("name")} autoComplete="name" value={f.name} onChange={set("name")} aria-invalid={!!errors.name} placeholder="Андрей" />
         {errors.name && <em role="alert">{errors.name}</em>}
       </label>
       <label className="cl-field">
         <span>Телефон *</span>
-        <input id="lead-phone" type="tel" inputMode="tel" autoComplete="tel" value={f.phone} onChange={set("phone")} aria-invalid={!!errors.phone} placeholder="+7 900 000-00-00" />
+        <input id={id("phone")} type="tel" inputMode="tel" autoComplete="tel" value={f.phone} onChange={set("phone")} aria-invalid={!!errors.phone} placeholder="+7 900 000-00-00" />
         {errors.phone && <em role="alert">{errors.phone}</em>}
       </label>
       <fieldset className="cl-field">
         <legend>Вид бизнеса *</legend>
-        <div className="cl-chips" id="lead-kind" tabIndex={-1}>
+        <div className="cl-chips" id={id("kind")} tabIndex={-1}>
           {KINDS.map((k) => (
             <button key={k.value} type="button" aria-pressed={f.kind === k.value} onClick={() => setF({ ...f, kind: k.value })}>{k.label}</button>
           ))}
@@ -72,7 +84,7 @@ export function LeadForm() {
         {errors.kind && <em role="alert">{errors.kind}</em>}
       </fieldset>
       <div className="cl-two">
-        <label className="cl-field"><span>Название</span><input autoComplete="organization" value={f.business} onChange={set("business")} placeholder="Alex Motors" /></label>
+        <label className="cl-field"><span>Название</span><input autoComplete="organization" value={f.business} onChange={set("business")} placeholder="Колесо" /></label>
         <label className="cl-field"><span>Город</span><input autoComplete="address-level2" value={f.city} onChange={set("city")} placeholder="Волгоград" /></label>
       </div>
       <label className="cl-field"><span>Комментарий</span><textarea rows={3} value={f.comment} onChange={set("comment")} placeholder="Сколько боксов или мастеров, что важно в записи" /></label>
