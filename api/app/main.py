@@ -6,7 +6,7 @@ from .services.subscription import SubscriptionError
 
 from .routers import admin, internal, leads, owner, public
 
-app = FastAPI(title="Clientus API", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
+app = FastAPI(title="clientall API", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
 app.include_router(public.router)
 app.include_router(leads.router)
 app.include_router(owner.router)

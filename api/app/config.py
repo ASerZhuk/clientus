@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     vapid_subject: str = Field(default="mailto:admin@example.com", alias="VAPID_SUBJECT")
     session_days: int = Field(default=14, alias="SESSION_DAYS")
     max_upload_mb: int = Field(default=8, alias="MAX_UPLOAD_MB")
-    platform_name: str = Field(default="Clientus", alias="PLATFORM_NAME")  # shown in «Работает на …»
+    platform_name: str = Field(default="clientall", alias="PLATFORM_NAME")  # shown in «Работает на …»
     platform_url: str = Field(default="", alias="PLATFORM_URL")
     platform_hosts: str = Field(default="localhost,127.0.0.1", alias="PLATFORM_HOSTS")  # hosts that serve /s/<slug>/ and /admin
     platform_ips: str = Field(default="", alias="PLATFORM_IPS")  # A-record targets customers must point their domain to

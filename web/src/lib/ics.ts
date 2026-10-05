@@ -8,7 +8,7 @@ export function buildIcs(b: ClientBooking, studio: { name: string; address: stri
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Clientus//RU",
+    "PRODID:-//clientall//RU",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `UID:booking-${b.id}@${studio.slug}`,

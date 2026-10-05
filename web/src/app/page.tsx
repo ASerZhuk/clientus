@@ -1,171 +1,161 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import {
-  ArrowRight, BellRinging, CalendarCheck, ChatCircleDots, CheckCircle, DeviceMobile, Globe, Lightning, Storefront, UsersThree,
-} from "@phosphor-icons/react/dist/ssr";
+import "@fontsource-variable/onest/index.css";
+import "@fontsource/lora/cyrillic-400-italic.css";
+import "@fontsource/lora/latin-400-italic.css";
 import { LeadForm } from "@/components/landing/LeadForm";
+import { Logo, LogoMark } from "@/components/landing/Logo";
 import "./landing.css";
 
 export const metadata: Metadata = {
-  title: "Clientus — онлайн-запись для автосервиса, мойки и салона красоты",
-  description: "Свой сайт записи и приложение на телефон для клиентов. Кабинет владельца, уведомления, помощник. Подключение за один день, оплата один раз — без подписки.",
+  title: "clientall — онлайн-запись для автосервиса, мойки и салона",
+  description: "Клиенты записываются сами по ссылке, вы видите записи в кабинете на телефоне и получаете уведомления. Подключение за день, оплата один раз — без подписки.",
   robots: { index: true, follow: true },
+  icons: { icon: "/brand/clientall-mark.svg" },
 };
 
 const KINDS = [
-  { img: "/landing/auto.webp", title: "Автосервис", text: "Боксы и подъёмники, длительные работы, марка и госномер в записи." },
-  { img: "/landing/wash.webp", title: "Автомойка", text: "Короткие услуги с шагом 30 минут, быстрая запись без звонков." },
-  { img: "/landing/master.webp", title: "Мастер красоты", text: "Личное расписание, услуги и цены, клиенты записываются сами." },
-  { img: "/landing/studio.webp", title: "Студия красоты", text: "Несколько мастеров со своим графиком — клиент выбирает, к кому." },
+  { img: "/landing/auto.webp", title: "Автосервис", text: "Боксы и подъёмники, работы на несколько дней, марка и госномер в записи." },
+  { img: "/landing/wash.webp", title: "Автомойка", text: "Короткие услуги, шаг 30 минут, запись без звонков в разгар смены." },
+  { img: "/landing/master.webp", title: "Мастер", text: "Личный график и прайс. Клиенты пишут не вам в мессенджер, а сразу в свободное окно." },
+  { img: "/landing/studio.webp", title: "Студия", text: "Несколько мастеров, у каждого свои часы. Клиент выбирает к кому или «любой свободный»." },
+];
+
+const BEFORE_AFTER = [
+  ["Телефон звонит, пока вы под машиной или с клиентом", "Клиент сам выбирает свободное время по ссылке"],
+  ["Запись в тетради или в заметках, путаница с боксами", "Расписание по боксам и мастерам, без двойных записей"],
+  ["Клиент забыл и не пришёл", "Напоминание приходит ему на телефон перед визитом"],
+  ["Цены и время — в голове у одного человека", "Услуги, цены и график в кабинете, меняются за минуту"],
 ];
 
 const FEATURES = [
-  { Icon: CalendarCheck, title: "Запись без звонков", text: "Клиент выбирает услугу и свободное время сам — без регистрации и паролей." },
-  { Icon: DeviceMobile, title: "Приложение на телефон", text: "Сайт ставится иконкой на экран клиента и владельца, как обычное приложение." },
-  { Icon: BellRinging, title: "Уведомления", text: "Вам — о новой записи и отмене, клиенту — напоминание перед визитом." },
-  { Icon: ChatCircleDots, title: "Помощник", text: "Подбирает клиенту время по фразе «развал в субботу утром». Вам — меняет цены и график по команде." },
-  { Icon: UsersThree, title: "Боксы и мастера", text: "Несколько рабочих мест, своё расписание у каждого, никаких двойных записей." },
-  { Icon: Globe, title: "Свой адрес", text: "Работает по нашей ссылке или на вашем домене — например, book.вашсервис.ru." },
+  ["Запись без регистрации", "Клиенту не нужны пароль и приложение из магазина — только ссылка."],
+  ["Иконка на телефоне", "Сайт ставится на экран клиента и владельца как обычное приложение."],
+  ["Уведомления", "Новая запись, перенос, отмена — сразу вам на телефон."],
+  ["Помощник", "Клиенту подбирает время по фразе «развал в субботу утром». Вам меняет цены и график по команде."],
+  ["Боксы и мастера", "У каждого свой график и выходные. Свободные окна считаются сами."],
+  ["Ваш адрес", "По нашей ссылке или на вашем домене — book.вашсервис.ru."],
 ];
 
 const PLANS = [
-  { name: "Стандарт", price: "3 500 ₽", text: "Сайт записи по нашей ссылке, кабинет владельца, приложение, уведомления, помощник.", accent: false },
-  { name: "Свой домен", price: "4 000 ₽", text: "Всё из «Стандарта» на вашем адресе: book.вашсервис.ru. HTTPS настроим автоматически.", accent: true },
-  { name: "Свой сервер", price: "7 000 ₽", text: "Приложение и данные на вашем сервере, без нашей подписи внизу сайта.", accent: false },
+  { name: "Стандарт", price: "3 500", text: "Сайт записи по нашей ссылке, кабинет, приложение, уведомления, помощник." },
+  { name: "Свой домен", price: "4 000", text: "Всё из «Стандарта» на вашем адресе. HTTPS настроим сами." },
+  { name: "Свой сервер", price: "7 000", text: "Приложение и данные на вашем сервере, без нашей подписи на сайте." },
 ];
 
 const FAQ = [
-  { q: "Нужно платить каждый месяц?", a: "Нет. Оплата один раз за пакет, студия работает бессрочно. Лимитов на записи, боксы и мастеров нет." },
-  { q: "Сколько времени занимает подключение?", a: "Обычно один день: мы заносим ваши услуги, цены, график и фото, вы получаете ссылку для клиентов и вход в кабинет." },
-  { q: "Клиентам нужно что-то устанавливать?", a: "Нет. Запись работает по ссылке в браузере. По желанию клиент добавит иконку на экран телефона в одно касание." },
-  { q: "Можно поменять цены и график самому?", a: "Да, в кабинете на телефоне — или просто напишите помощнику: «подними цену на мойку до 900»." },
-  { q: "Где хранятся данные?", a: "На сервере в России. В пакете «Свой сервер» — на вашем." },
+  ["Нужно платить каждый месяц?", "Нет. Платите один раз за пакет — запись работает бессрочно. Лимитов на записи, боксы и мастеров нет."],
+  ["Сколько времени занимает подключение?", "Обычно день. Мы заносим ваши услуги, цены, график и фото, вы получаете ссылку для клиентов и вход в кабинет."],
+  ["Клиентам нужно что-то устанавливать?", "Нет, запись работает в браузере. Добавить иконку на экран — по желанию, в одно касание."],
+  ["Смогу поменять цены и график сам?", "Да, в кабинете на телефоне. Или напишите помощнику: «подними цену на мойку до 900»."],
+  ["Где хранятся данные клиентов?", "На сервере в России. В пакете «Свой сервер» — на вашем."],
 ];
+
+function BookingMock() {
+  const slots = [["10:00", ""], ["11:00", "busy"], ["12:00", "on"], ["13:30", ""], ["14:00", "busy"], ["15:00", ""]];
+  return (
+    <div className="mk" aria-hidden>
+      <div className="mk-phone">
+        <div className="mk-top"><span className="mk-ava">К</span><span><b>Колесо</b><small>автосервис · Волгоград</small></span></div>
+        <p className="mk-label">Развал-схождение · 1 час · 2 000 ₽</p>
+        <div className="mk-days">
+          {[["пн", "6"], ["вт", "7"], ["ср", "8"], ["чт", "9"], ["пт", "10"]].map(([d, n], i) => <span key={n} className={i === 1 ? "on" : ""}><small>{d}</small>{n}</span>)}
+        </div>
+        <div className="mk-slots">{slots.map(([t, s]) => <span key={t} className={s}>{t}</span>)}</div>
+        <div className="mk-btn">Записаться на 12:00</div>
+      </div>
+      <div className="mk-push">
+        <LogoMark size={22} />
+        <span><b>Новая запись</b>вт, 7 октября, 12:00 · Развал-схождение · Kia Rio</span>
+      </div>
+    </div>
+  );
+}
 
 export default function Landing() {
   return (
-    <div className="lp">
-      <header className="lp-nav">
-        <div className="lp-wrap lp-nav-inner">
-          <a href="#top" className="lp-brand" aria-label="Clientus — наверх"><span className="lp-brand-mark" aria-hidden><Lightning weight="fill" /></span>Clientus</a>
-          <nav className="lp-links" aria-label="Разделы">
-            <a href="#for">Для кого</a><a href="#features">Возможности</a><a href="#prices">Цены</a><a href="#faq">Вопросы</a>
-          </nav>
-          <a href="#form" className="lp-btn lp-btn-sm">Подключить</a>
+    <div className="cl">
+      <a href="#form" className="cl-skip">К заявке</a>
+      <header className="cl-nav">
+        <div className="cl-wrap cl-nav-in">
+          <a href="#top" aria-label="clientall — наверх"><Logo size={28} /></a>
+          <nav aria-label="Разделы"><a href="#for">Для кого</a><a href="#prices">Цены</a><a href="#faq">Вопросы</a></nav>
+          <a href="#form" className="cl-btn cl-btn-sm">Оставить заявку</a>
         </div>
       </header>
 
       <main id="top">
-        <section className="lp-hero">
-          <div className="lp-wrap lp-hero-grid">
-            <div className="lp-hero-copy">
-              <span className="lp-eyebrow"><span className="lp-dot" aria-hidden />Без подписки · запуск за 1 день</span>
-              <h1>Онлайн-запись, которая работает, пока вы работаете</h1>
-              <p className="lp-lead">Свой сайт записи и приложение на телефон для автосервиса, мойки и салона красоты. Клиенты записываются сами — вы видите всё в кабинете и получаете уведомления.</p>
-              <div className="lp-cta-row">
-                <a href="#form" className="lp-btn">Подключить запись <ArrowRight weight="bold" aria-hidden /></a>
-                <a href="#how" className="lp-btn lp-btn-ghost">Как это работает</a>
+        <section className="cl-hero cl-wrap">
+          <div className="cl-hero-copy">
+            <p className="cl-kicker">Онлайн-запись для сервиса и красоты</p>
+            <h1>Клиенты записываются сами. <em>Вы&nbsp;— работаете.</em></h1>
+            <p className="cl-lead">Своя страница записи и приложение на телефон. Клиент выбирает услугу и свободное время, вы получаете уведомление и видите запись в кабинете.</p>
+            <div className="cl-cta">
+              <a href="#form" className="cl-btn">Подключить за 3 500 ₽</a>
+              <span className="cl-cta-note">один раз, без подписки<br />запуск за день</span>
+            </div>
+          </div>
+          <BookingMock />
+        </section>
+
+        <section id="for" className="cl-sec cl-wrap">
+          <div className="cl-head"><span className="cl-num">01</span><h2>Для кого</h2></div>
+          <div className="cl-kinds">
+            {KINDS.map((k) => (
+              <figure key={k.title} className="cl-kind">
+                <div className="cl-kind-img"><Image src={k.img} alt={k.title} fill sizes="(max-width: 700px) 50vw, 25vw" /></div>
+                <figcaption><b>{k.title}</b>{k.text}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <section className="cl-sec cl-wrap">
+          <div className="cl-head"><span className="cl-num">02</span><h2>Что изменится</h2></div>
+          <div className="cl-ba" role="table" aria-label="Было и стало">
+            <div className="cl-ba-row cl-ba-th" role="row"><span role="columnheader">Было</span><span role="columnheader">С clientall</span></div>
+            {BEFORE_AFTER.map(([a, b]) => <div key={a} className="cl-ba-row" role="row"><span role="cell">{a}</span><span role="cell">{b}</span></div>)}
+          </div>
+        </section>
+
+        <section className="cl-sec cl-wrap">
+          <div className="cl-head"><span className="cl-num">03</span><h2>Что внутри</h2></div>
+          <dl className="cl-feat">
+            {FEATURES.map(([t, d]) => <div key={t}><dt>{t}</dt><dd>{d}</dd></div>)}
+          </dl>
+        </section>
+
+        <section id="prices" className="cl-sec cl-wrap">
+          <div className="cl-head"><span className="cl-num">04</span><h2>Цены</h2><p>Один платёж. Без подписок, процентов и лимитов.</p></div>
+          <div className="cl-plans">
+            {PLANS.map((p) => (
+              <div key={p.name} className="cl-plan">
+                <b>{p.name}</b>
+                <p>{p.text}</p>
+                <span className="cl-price">{p.price}&nbsp;₽</span>
+                <a href="#form" className="cl-btn cl-btn-line cl-btn-sm">Выбрать</a>
               </div>
-              <ul className="lp-trust">
-                <li><CheckCircle weight="fill" aria-hidden />от 3 500 ₽ один раз</li>
-                <li><CheckCircle weight="fill" aria-hidden />без лимитов на записи</li>
-                <li><CheckCircle weight="fill" aria-hidden />данные в России</li>
-              </ul>
-            </div>
-            <div className="lp-hero-art">
-              <Image src="/landing/hero.webp" alt="Клиент записывается на сервис с телефона" fill priority sizes="(max-width: 900px) 100vw, 50vw" />
-              <div className="lp-float lp-float-a"><BellRinging weight="fill" aria-hidden /><span><b>Новая запись</b><small>сб, 10:00 · Развал-схождение</small></span></div>
-              <div className="lp-float lp-float-b"><CalendarCheck weight="fill" aria-hidden /><span><b>Свободно</b><small>11:00 · 12:00 · 14:30</small></span></div>
-            </div>
+            ))}
           </div>
         </section>
 
-        <section id="for" className="lp-section">
-          <div className="lp-wrap">
-            <h2>Для кого</h2>
-            <p className="lp-sub">Одна система, настроенная под ваш бизнес: свои слова, поля и правила записи.</p>
-            <div className="lp-kinds">
-              {KINDS.map((k) => (
-                <article key={k.title} className="lp-kind">
-                  <Image src={k.img} alt="" fill sizes="(max-width: 700px) 80vw, 25vw" />
-                  <div className="lp-kind-text"><h3>{k.title}</h3><p>{k.text}</p></div>
-                </article>
-              ))}
-            </div>
-          </div>
+        <section id="faq" className="cl-sec cl-wrap">
+          <div className="cl-head"><span className="cl-num">05</span><h2>Вопросы</h2></div>
+          <div className="cl-faq">{FAQ.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div>
         </section>
 
-        <section id="how" className="lp-section">
-          <div className="lp-wrap lp-how">
-            <div>
-              <h2>Как это работает</h2>
-              <p className="lp-sub">Клиенту — три касания. Вам — запись в кабинете и уведомление на телефон.</p>
-            </div>
-            <ol className="lp-steps">
-              <li><b>Клиент открывает вашу ссылку</b><span>Из соцсетей, карт, визитки или QR-кода на стойке.</span></li>
-              <li><b>Выбирает услугу и время</b><span>Видит только реально свободные окна — двойных записей не бывает.</span></li>
-              <li><b>Оставляет имя и телефон</b><span>Запись подтверждена сразу, перед визитом придёт напоминание.</span></li>
-              <li><b>Вы получаете уведомление</b><span>Запись уже в расписании кабинета: перенос, отмена, звонок клиенту — в одно касание.</span></li>
-            </ol>
-          </div>
-        </section>
-
-        <section id="features" className="lp-section">
-          <div className="lp-wrap">
-            <h2>Возможности</h2>
-            <div className="lp-features">
-              {FEATURES.map(({ Icon, title, text }) => (
-                <article key={title} className="lp-feature"><span className="lp-icon" aria-hidden><Icon weight="duotone" /></span><h3>{title}</h3><p>{text}</p></article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="prices" className="lp-section">
-          <div className="lp-wrap">
-            <h2>Цены</h2>
-            <p className="lp-sub">Платите один раз. Никаких подписок, процентов и лимитов.</p>
-            <div className="lp-plans">
-              {PLANS.map((p) => (
-                <article key={p.name} className={`lp-plan${p.accent ? " lp-plan-accent" : ""}`}>
-                  {p.accent && <span className="lp-badge">Популярный</span>}
-                  <h3>{p.name}</h3>
-                  <div className="lp-price">{p.price}<small> один раз</small></div>
-                  <p>{p.text}</p>
-                  <a href="#form" className={`lp-btn ${p.accent ? "" : "lp-btn-ghost"}`}>Выбрать</a>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="faq" className="lp-section">
-          <div className="lp-wrap lp-faq-wrap">
-            <h2>Вопросы</h2>
-            <div className="lp-faq">
-              {FAQ.map((f) => <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>)}
-            </div>
-          </div>
-        </section>
-
-        <section id="form" className="lp-section lp-form-section">
-          <div className="lp-wrap lp-form-grid">
-            <div>
-              <span className="lp-icon lp-icon-lg" aria-hidden><Storefront weight="duotone" /></span>
-              <h2>Подключить онлайн-запись</h2>
-              <p className="lp-sub">Оставьте контакты — перезвоним в течение дня, уточним услуги и график и пришлём готовую ссылку для клиентов.</p>
-              <ul className="lp-trust lp-trust-col">
-                <li><CheckCircle weight="fill" aria-hidden />Бесплатно покажем, как будет выглядеть ваша запись</li>
-                <li><CheckCircle weight="fill" aria-hidden />Оплата только после того, как понравится</li>
-                <li><CheckCircle weight="fill" aria-hidden />Настроим всё за вас</li>
-              </ul>
+        <section id="form" className="cl-form-sec">
+          <div className="cl-wrap cl-form-grid">
+            <div className="cl-form-copy">
+              <h2>Подключим запись <em>за&nbsp;день</em></h2>
+              <p>Оставьте телефон — перезвоним, спросим про услуги и график и покажем, как будет выглядеть ваша страница. Платить — только если понравится.</p>
             </div>
             <LeadForm />
           </div>
         </section>
       </main>
 
-      <footer className="lp-footer"><div className="lp-wrap">© {new Date().getFullYear()} Clientus · онлайн-запись для сервиса и красоты</div></footer>
+      <footer className="cl-foot cl-wrap"><Logo size={22} /><span>© {new Date().getFullYear()} · онлайн-запись для сервиса и красоты</span></footer>
     </div>
   );
 }

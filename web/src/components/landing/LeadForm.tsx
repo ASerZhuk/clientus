@@ -43,7 +43,7 @@ export function LeadForm() {
 
   if (state === "done")
     return (
-      <div className="lp-card lp-done" role="status">
+      <div className="cl-card cl-done" role="status">
         <CheckCircle size={44} weight="fill" aria-hidden />
         <h3>Заявка отправлена</h3>
         <p>Спасибо, {f.name.trim()}! Перезвоним на {f.phone} в течение дня.</p>
@@ -51,37 +51,37 @@ export function LeadForm() {
     );
 
   return (
-    <form className="lp-card lp-form" onSubmit={submit} noValidate>
-      <label className="lp-field">
+    <form className="cl-card cl-form" onSubmit={submit} noValidate>
+      <label className="cl-field">
         <span>Имя *</span>
         <input id="lead-name" autoComplete="name" value={f.name} onChange={set("name")} aria-invalid={!!errors.name} placeholder="Андрей" />
         {errors.name && <em role="alert">{errors.name}</em>}
       </label>
-      <label className="lp-field">
+      <label className="cl-field">
         <span>Телефон *</span>
         <input id="lead-phone" type="tel" inputMode="tel" autoComplete="tel" value={f.phone} onChange={set("phone")} aria-invalid={!!errors.phone} placeholder="+7 900 000-00-00" />
         {errors.phone && <em role="alert">{errors.phone}</em>}
       </label>
-      <fieldset className="lp-field">
+      <fieldset className="cl-field">
         <legend>Вид бизнеса *</legend>
-        <div className="lp-chips" id="lead-kind" tabIndex={-1}>
+        <div className="cl-chips" id="lead-kind" tabIndex={-1}>
           {KINDS.map((k) => (
             <button key={k.value} type="button" aria-pressed={f.kind === k.value} onClick={() => setF({ ...f, kind: k.value })}>{k.label}</button>
           ))}
         </div>
         {errors.kind && <em role="alert">{errors.kind}</em>}
       </fieldset>
-      <div className="lp-two">
-        <label className="lp-field"><span>Название</span><input autoComplete="organization" value={f.business} onChange={set("business")} placeholder="Alex Motors" /></label>
-        <label className="lp-field"><span>Город</span><input autoComplete="address-level2" value={f.city} onChange={set("city")} placeholder="Волгоград" /></label>
+      <div className="cl-two">
+        <label className="cl-field"><span>Название</span><input autoComplete="organization" value={f.business} onChange={set("business")} placeholder="Alex Motors" /></label>
+        <label className="cl-field"><span>Город</span><input autoComplete="address-level2" value={f.city} onChange={set("city")} placeholder="Волгоград" /></label>
       </div>
-      <label className="lp-field"><span>Комментарий</span><textarea rows={3} value={f.comment} onChange={set("comment")} placeholder="Сколько боксов или мастеров, что важно в записи" /></label>
-      <label className="lp-hp" aria-hidden>Сайт<input tabIndex={-1} autoComplete="off" value={f.website} onChange={set("website")} /></label>
-      {errors.form && <em className="lp-form-error" role="alert">{errors.form}</em>}
-      <button type="submit" className="lp-btn lp-btn-block" disabled={state === "sending"}>
+      <label className="cl-field"><span>Комментарий</span><textarea rows={3} value={f.comment} onChange={set("comment")} placeholder="Сколько боксов или мастеров, что важно в записи" /></label>
+      <label className="cl-hp" aria-hidden>Сайт<input tabIndex={-1} autoComplete="off" value={f.website} onChange={set("website")} /></label>
+      {errors.form && <em className="cl-form-error" role="alert">{errors.form}</em>}
+      <button type="submit" className="cl-btn cl-btn-block" disabled={state === "sending"}>
         {state === "sending" ? "Отправляем…" : <>Отправить заявку <PaperPlaneRight weight="fill" aria-hidden /></>}
       </button>
-      <small className="lp-note">Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи по заявке.</small>
+      <small className="cl-note">Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи по заявке.</small>
     </form>
   );
 }
