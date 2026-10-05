@@ -8,10 +8,10 @@ export function LogoMark({ size = 28, ink = "currentColor", accent = "#efe5d3" }
   );
 }
 
-export function Logo({ size = 28, className }: { size?: number; className?: string }) {
+export function Logo({ size = 28, className, accent }: { size?: number; className?: string; accent?: string }) {
   return (
     <span className={`cl-logo ${className ?? ""}`} style={{ fontSize: size * 0.82 }}>
-      <LogoMark size={size} />
+      <LogoMark size={size} accent={accent} />
       <span>clientall</span>
     </span>
   );
