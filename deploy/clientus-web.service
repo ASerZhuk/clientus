@@ -1,6 +1,6 @@
 # /etc/systemd/system/clientus-web.service
 [Unit]
-Description=Clientus web (Next.js)
+Description=clientall web (Next.js)
 After=network.target clientus-api.service
 
 [Service]

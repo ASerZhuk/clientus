@@ -1,4 +1,4 @@
-# Clientus platform server (prod + test on one VPS)
+# clientall platform server (prod + test on one VPS)
 
 Next.js is built on your PC (`output: "standalone"`); the server only runs it. No Node dependencies are installed
 and nothing is compiled on the server, so 2 GB RAM is enough.

@@ -1,6 +1,6 @@
 # /etc/systemd/system/clientus-api.service
 [Unit]
-Description=Clientus API (FastAPI)
+Description=clientall API (FastAPI)
 After=network.target
 
 [Service]

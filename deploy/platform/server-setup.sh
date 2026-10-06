@@ -1,5 +1,5 @@
 #!/bin/sh
-# One-time setup of a fresh Ubuntu 24.04 VPS for the Clientus platform. Run as root (scripts/server.sh setup does it):
+# One-time setup of a fresh Ubuntu 24.04 VPS for the clientall platform. Run as root (scripts/server.sh setup does it):
 #   PROD_DOMAIN=clientus.ru TEST_DOMAIN=test.clientus.ru ACME_EMAIL=you@mail.ru DEPLOY_KEY="ssh-ed25519 ..." sh server-setup.sh
 # Safe to run again: existing .env files, databases and keys are kept.
 set -eu

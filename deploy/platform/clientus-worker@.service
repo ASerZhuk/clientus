@@ -1,6 +1,6 @@
 # /etc/systemd/system/clientus-worker@.service — sends push notifications from the outbox
 [Unit]
-Description=Clientus worker (%i)
+Description=clientall worker (%i)
 After=clientus-api@%i.service
 
 [Service]

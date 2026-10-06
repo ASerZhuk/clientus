@@ -1,6 +1,6 @@
 # /etc/systemd/system/clientus-web@.service — Next.js standalone build made on the developer PC
 [Unit]
-Description=Clientus web (%i)
+Description=clientall web (%i)
 After=network.target clientus-api@%i.service
 
 [Service]

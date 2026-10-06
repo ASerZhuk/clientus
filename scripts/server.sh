@@ -1,5 +1,5 @@
 #!/bin/sh
-# Clientus server control from the developer PC. Settings: scripts/server.env (copy server.env.example; never committed).
+# clientall server control from the developer PC. Settings: scripts/server.env (copy server.env.example; never committed).
 #   sh scripts/server.sh setup                 one-time server setup (root SSH)
 #   sh scripts/server.sh deploy test|prod      tests -> build Next.js here -> upload -> migrate -> switch -> health check
 #   sh scripts/server.sh rollback test|prod    back to the previous release

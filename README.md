@@ -1,4 +1,4 @@
-# Clientus — online booking for auto studios and beauty (multi-tenant PWA)
+# clientall — online booking for auto studios and beauty (multi-tenant PWA)
 
 One Next.js build + one FastAPI + one SQLite database serve many studios at `/s/<slug>/`; each studio is a folder `tenants/<slug>/business.json` + photos.
 Clients book without registration; owners manage bookings, prices, hours and photos from a phone-friendly cabinet at `/s/<slug>/owner`.

@@ -1,6 +1,6 @@
 # /etc/systemd/system/clientus-api@.service — instance = prod | test (see deploy/platform/README.md)
 [Unit]
-Description=Clientus API (%i)
+Description=clientall API (%i)
 After=network.target
 
 [Service]
