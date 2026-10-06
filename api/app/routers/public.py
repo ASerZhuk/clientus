@@ -1,6 +1,6 @@
 """Public + client endpoints. The tenant comes from the slug; the client proves access to
 one booking with an unguessable token (X-Booking-Token). No client data is ever public."""
-from datetime import date
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse
@@ -11,6 +11,7 @@ from ..config import get_settings
 from ..deps import TenantCtx, client_booking_id, tenant_dep
 from ..models import Booking, PushSubscription, Service, TenantSettings
 from ..ratelimit import limit_request
+from ..security import calendar_sig, safe_equal
 from ..schemas import AssistantIn, BookingIn, PushRotateIn, PushSubscriptionIn
 from ..services import assistant, subscription
 from ..services import booking as bk
@@ -150,6 +151,32 @@ def my_booking(response: Response, booking_id: int = Depends(client_booking_id),
         settings = db.scalar(select(TenantSettings))
         booking = db.get(Booking, booking_id)
         return booking_client_view(db, booking, settings, now_min())
+
+
+def _ics_text(text: str) -> str:
+    return text.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
+
+
+@router.get("/s/{slug}/calendar/{booking_id}.ics")
+def booking_ics(booking_id: int, sig: str = Query(min_length=8, max_length=64), tenant: TenantCtx = Depends(tenant_dep)) -> Response:
+    """Served as text/calendar so Safari (iPhone, Mac) opens its own "Add to Calendar" sheet instead of downloading a file."""
+    if not safe_equal(sig, calendar_sig(tenant.id, booking_id)):
+        raise HTTPException(404, {"code": "booking_not_found"})
+    with database.read_session(tenant.id) as db:
+        settings = db.scalar(select(TenantSettings))
+        b = db.get(Booking, booking_id)
+        if not b or b.status == "cancelled":
+            raise HTTPException(404, {"code": "booking_not_found"})
+        stamp = lambda m: datetime.fromtimestamp(m * 60, timezone.utc).strftime("%Y%m%dT%H%M%SZ")  # noqa: E731
+        note = (f"Автомобиль: {b.car}\n" if b.car else "") + (f"Телефон: {settings.phone}" if settings.phone else "")
+        body = "\r\n".join([
+            "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//clientall//RU", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT",
+            f"UID:booking-{b.id}@{tenant.slug}", f"DTSTAMP:{stamp(now_min())}", f"DTSTART:{stamp(b.start_min)}", f"DTEND:{stamp(b.end_min)}",
+            f"SUMMARY:{_ics_text(f'{b.service_name} — {settings.name}')}", f"LOCATION:{_ics_text(settings.address or '')}", f"DESCRIPTION:{_ics_text(note)}",
+            "BEGIN:VALARM", "TRIGGER:-PT2H", "ACTION:DISPLAY", f"DESCRIPTION:{_ics_text(b.service_name)}", "END:VALARM",
+            "END:VEVENT", "END:VCALENDAR", "",
+        ])
+    return Response(body, media_type="text/calendar; charset=utf-8", headers={"Content-Disposition": f'inline; filename="zapis-{booking_id}.ics"', "Cache-Control": "no-store"})
 
 
 @router.post("/s/{slug}/my/cancel")

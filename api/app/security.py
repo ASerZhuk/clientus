@@ -41,6 +41,12 @@ def derived_access_token(tenant_id: int, booking_id: int, idempotency_key: str) 
     return base64.urlsafe_b64encode(mac).decode().rstrip("=")
 
 
+def calendar_sig(tenant_id: int, booking_id: int) -> str:
+    """Opens only the calendar event of one booking (no access to the booking itself), so it may sit in a URL."""
+    msg = f"ics|{tenant_id}|{booking_id}".encode()
+    return hmac.new(get_settings().secret_key.encode(), msg, hashlib.sha256).hexdigest()[:24]
+
+
 def safe_equal(a: str, b: str) -> bool:
     return hmac.compare_digest(a.encode(), b.encode())
 

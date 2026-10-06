@@ -39,3 +39,28 @@ export function downloadIcs(b: ClientBooking, studio: Parameters<typeof buildIcs
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
+
+const gstamp = (minute: number) => stamp(minute);
+const isApple = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  || (/macintosh/i.test(navigator.userAgent) && /safari/i.test(navigator.userAgent) && !/chrome|chromium|edg|firefox|yabrowser/i.test(navigator.userAgent));
+
+/**
+ * Add the booking to the phone's calendar without a downloaded file:
+ * Apple devices open our text/calendar link and Safari shows its own "Add to Calendar" sheet;
+ * everything else opens Google Calendar with the event already filled in (one tap "Save").
+ */
+export function addToCalendar(b: ClientBooking, studio: Parameters<typeof buildIcs>[1], api: string): void {
+  if (isApple() && b.calendar_sig) {
+    window.location.href = `${api}/calendar/${b.id}.ics?sig=${b.calendar_sig}`;
+    return;
+  }
+  const q = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `${b.service_name} — ${studio.name}`,
+    dates: `${gstamp(b.start_min)}/${gstamp(b.end_min)}`,
+    details: [b.car ? `Автомобиль: ${b.car}` : "", studio.phone ? `Телефон: ${studio.phone}` : ""].filter(Boolean).join("\n"),
+    location: studio.address,
+  });
+  const w = window.open(`https://calendar.google.com/calendar/render?${q}`, "_blank", "noopener");
+  if (!w) downloadIcs(b, studio); // pop-up blocked: fall back to the file
+}

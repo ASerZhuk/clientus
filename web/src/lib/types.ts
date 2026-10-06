@@ -125,6 +125,7 @@ export interface ClientBooking {
   can_cancel: boolean;
   cancel_deadline_min: number;
   cancel_before_hours: number;
+  calendar_sig?: string;
 }
 
 export interface CreatedBooking {

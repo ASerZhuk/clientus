@@ -8,6 +8,7 @@ from .services import media
 from .config import get_settings
 from .plans import get_plan
 from .profiles import get_profile
+from .security import calendar_sig
 from .services import subscription
 from .services.slots import offers_for
 
@@ -123,6 +124,7 @@ def booking_client_view(db: Session, b: Booking, s: TenantSettings, now_min: int
         "can_cancel": b.status == "booked" and now_min <= deadline,
         "cancel_deadline_min": deadline,
         "cancel_before_hours": s.cancel_before_hours,
+        "calendar_sig": calendar_sig(b.tenant_id, b.id),
     }
 
 

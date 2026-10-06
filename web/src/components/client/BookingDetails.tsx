@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useStudio, useVocab } from "@/components/StudioProviders";
 import { api, ApiError, studioApi } from "@/lib/api";
 import { formatDuration, formatMoney, longDayLabel, shownStatus, telHref, timeOf } from "@/lib/format";
-import { downloadIcs } from "@/lib/ics";
+import { addToCalendar } from "@/lib/ics";
 import { detectPush, deniedHelp, onPermissionMaybeChanged, subscribePush, currentEndpoint, type PushSupport } from "@/lib/push";
 import type { ClientBooking, PushConfig } from "@/lib/types";
 
@@ -117,7 +117,7 @@ export function BookingDetails({ booking, token, onChanged }: { booking: ClientB
       {!cancelled && (
         <>
           <Reminder token={token} />
-          <Button label="Добавить в календарь" icon={<CalendarPlus weight="fill" />} variant="secondary" width="100%" onClick={() => downloadIcs(booking, { name: tenant.name, address: tenant.address, phone: tenant.phone, slug })} />
+          <Button label="Добавить в календарь" icon={<CalendarPlus weight="fill" />} variant="secondary" width="100%" onClick={() => addToCalendar(booking, { name: tenant.name, address: tenant.address, phone: tenant.phone, slug }, studioApi(slug))} />
           {booking.status === "booked" && (booking.can_cancel ? (
             <Button label="Отменить запись" variant="ghost" width="100%" onClick={() => setConfirm(true)} />
           ) : (
