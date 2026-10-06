@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRinging, DownloadSimple, Export } from "@phosphor-icons/react";
+import { ArrowSquareOut, BellRinging, DownloadSimple, Export } from "@phosphor-icons/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useStudio } from "@/components/StudioProviders";
@@ -75,6 +75,16 @@ export function OwnerPushBanner() {
     </div>
   );
 }
+/**
+ * Android: no API opens an installed web app, but the installed app (WebAPK) registers for its own URLs,
+ * so a system VIEW intent for the start URL is handed to it. If nothing takes it, Chrome just opens the page.
+ */
+function openInstalled(path: string) {
+  const u = new URL(path, window.location.origin);
+  if (!/android/i.test(navigator.userAgent)) { window.location.href = u.href; return; }
+  window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(u.href)};end`;
+}
+
 const isPhone = () => window.matchMedia("(pointer: coarse)").matches && window.innerWidth < 900;
 
 function snoozed(key: string): boolean {
@@ -89,10 +99,17 @@ function snooze(key: string) {
  * Browsers allow both only from a tap, so this is a sheet with buttons, shown once a week at most.
  */
 export function AppPrompt({ audience }: { audience: "client" | "owner" }) {
-  const { slug, tenant } = useStudio();
+  const { slug, tenant, href } = useStudio();
   const { state, install } = useInstall();
   const key = `app-prompt:${slug}:${audience}`;
   const [open, setOpen] = useState(false);
+  // Android: Chrome reports a finished install ("appinstalled"); then we offer to open the installed app right away
+  const [justInstalled, setJustInstalled] = useState(false);
+  useEffect(() => {
+    const done = () => { setJustInstalled(true); setOpen(true); };
+    window.addEventListener("appinstalled", done);
+    return () => window.removeEventListener("appinstalled", done);
+  }, []);
   const owner = useOwnerPush(audience === "owner");
   const push = audience === "owner" && owner.known ? owner.support : null;
   const pushOn = owner.on;
@@ -110,7 +127,8 @@ export function AppPrompt({ audience }: { audience: "client" | "owner" }) {
 
   const close = () => { snooze(key); setOpen(false); };
   const enablePush = async () => { if (await owner.enable() && !canInstall) close(); };
-  const doInstall = async () => { if (await install() && !canPush) close(); };
+  const doInstall = async () => { if (await install()) setJustInstalled(true); };
+  const openApp = () => openInstalled(href(audience === "owner" ? "/owner?source=pwa" : "/?source=pwa"));
 
   const ios = state === "ios";
   return (
@@ -121,14 +139,20 @@ export function AppPrompt({ audience }: { audience: "client" | "owner" }) {
           <img src={tenant.pwa.icon192} alt="" width={56} height={56} style={{ borderRadius: 14 }} />
           <div><b style={{ fontSize: 19 }}>{tenant.name}</b><div className="muted" style={{ fontSize: 14 }}>{audience === "owner" ? "Кабинет владельца" : "Приложение студии"}</div></div>
         </div>
-        {canInstall && (
+        {justInstalled && (
+          <section className="stack" style={{ gap: 8 }}>
+            <b>Приложение установлено</b>
+            <Button label="Открыть приложение" icon={<ArrowSquareOut weight="bold" />} variant="primary" size="lg" width="100%" onClick={openApp} />
+          </section>
+        )}
+        {canInstall && !justInstalled && (
           <section className="stack" style={{ gap: 8 }}>
             <b>Установите приложение</b>
             <span className="muted" style={{ fontSize: 14 }}>
               {audience === "owner" ? (ios ? "Так на iPhone работают уведомления. Вход сохранится." : "Кабинет откроется с иконки, как обычное приложение.") : "Запись к нам — в одно касание с экрана телефона."}
             </span>
             {state === "prompt" && <Button label="Установить" icon={<DownloadSimple weight="bold" />} variant="primary" width="100%" onClick={doInstall} />}
-            {ios && <p className="app-prompt-ios">Нажмите <Export weight="bold" aria-label="Поделиться" /> внизу экрана → <b>«На экран Домой»</b></p>}
+            {ios && <p className="app-prompt-ios">Нажмите <Export weight="bold" aria-label="Поделиться" /> → <b>«На экран Домой»</b> → <b>«Добавить»</b>.<br />Потом откройте приложение с иконки на экране.</p>}
             {state === "manual" && <span style={{ fontSize: 14 }}>Откройте меню браузера «⋮» и выберите «Установить приложение» или «Добавить на главный экран».</span>}
           </section>
         )}
