@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRinging, DownloadSimple } from "@phosphor-icons/react";
+import { BellRinging, DownloadSimple, Export } from "@phosphor-icons/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useStudio } from "@/components/StudioProviders";
@@ -61,7 +61,7 @@ export function OwnerPushBanner() {
     return (
       <div className="push-banner" role="region" aria-label="Уведомления">
         <BellRinging size={22} weight="fill" aria-hidden />
-        <span className="grow"><b>Уведомления на iPhone</b><small>Нажмите «Поделиться» → «На экран Домой», откройте кабинет с новой иконки и войдите — там появится кнопка «Включить».</small></span>
+        <span className="grow"><b>Уведомления на iPhone</b><small>Нажмите <Export weight="bold" aria-label="Поделиться" /> → «На экран Домой» и откройте кабинет с иконки</small></span>
         <button type="button" className="push-banner-x" aria-label="Скрыть на сегодня" onClick={close}>×</button>
       </div>
     );
@@ -125,22 +125,18 @@ export function AppPrompt({ audience }: { audience: "client" | "owner" }) {
           <section className="stack" style={{ gap: 8 }}>
             <b>Установите приложение</b>
             <span className="muted" style={{ fontSize: 14 }}>
-              {audience === "owner" ? "Кабинет откроется с иконки на экране, как обычное приложение." : "Иконка студии на экране: запись и ваша запись в одно касание."}
+              {audience === "owner" ? (ios ? "Так на iPhone работают уведомления. Вход сохранится." : "Кабинет откроется с иконки, как обычное приложение.") : "Запись к нам — в одно касание с экрана телефона."}
             </span>
             {state === "prompt" && <Button label="Установить" icon={<DownloadSimple weight="bold" />} variant="primary" width="100%" onClick={doInstall} />}
-            {ios && <ol className="app-prompt-steps"><li>Нажмите «Поделиться» внизу Safari</li><li>Выберите «На экран Домой»</li><li>Нажмите «Добавить»</li></ol>}
+            {ios && <p className="app-prompt-ios">Нажмите <Export weight="bold" aria-label="Поделиться" /> внизу экрана → <b>«На экран Домой»</b></p>}
             {state === "manual" && <span style={{ fontSize: 14 }}>Откройте меню браузера «⋮» и выберите «Установить приложение» или «Добавить на главный экран».</span>}
           </section>
         )}
-        {canPush && (
+        {canPush && push?.state !== "ios-install" && (
           <section className="stack" style={{ gap: 8 }}>
             <b>Уведомления о записях</b>
-            {push?.state === "ios-install"
-              ? <span className="muted" style={{ fontSize: 14 }}>На iPhone уведомления включаются после установки: откройте кабинет с иконки на экране — предложим снова.</span>
-              : <>
-                  <span className="muted" style={{ fontSize: 14 }}>Сообщим о новой записи, переносе и отмене, даже когда кабинет закрыт.</span>
-                  <Button label="Включить уведомления" icon={<BellRinging weight="fill" />} variant={state === "prompt" ? "secondary" : "primary"} width="100%" isLoading={busy} onClick={enablePush} />
-                </>}
+            <span className="muted" style={{ fontSize: 14 }}>Новая запись, перенос, отмена — сразу на телефон.</span>
+            <Button label="Включить уведомления" icon={<BellRinging weight="fill" />} variant={state === "prompt" ? "secondary" : "primary"} size="lg" width="100%" isLoading={busy} onClick={enablePush} />
             {error && <span className="error-text" role="alert">{error}</span>}
           </section>
         )}

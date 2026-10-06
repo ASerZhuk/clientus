@@ -60,6 +60,10 @@ class LeadIn(Strict):
         return v
 
 
+class InstallCodeIn(Strict):
+    code: str = Field(min_length=10, max_length=120)
+
+
 class PasswordChangeIn(Strict):
     new: str = Field(min_length=10, max_length=200)  # same minimum as owner:create
 

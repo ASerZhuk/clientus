@@ -1,5 +1,7 @@
 """Owner cabinet API. Every route except login depends on owner_dep: session cookie ->
 server-side session -> membership for the slug's tenant -> CSRF token on unsafe methods."""
+import hashlib
+import hmac
 import logging
 import secrets
 from datetime import date, timedelta
@@ -35,6 +37,7 @@ from ..schemas import (
     BlockIn,
     CaptionIn,
     HoursIn,
+    InstallCodeIn,
     LoginIn,
     OfferIn,
     OwnerBookingIn,
@@ -79,6 +82,10 @@ def login(body: LoginIn, request: Request, response: Response, tenant: TenantCtx
     password_ok = verify_password(body.password, user.password_hash if user else None)
     if not (user and member and password_ok):  # same answer for every failure
         raise HTTPException(401, {"code": "invalid_credentials"})
+    return _start_session(response, user, tenant)
+
+
+def _start_session(response: Response, user: User, tenant: TenantCtx) -> dict:
     token, csrf = new_token(), secrets.token_urlsafe(24)
     ttl = get_settings().session_days * 86400
     with database.write_session() as db:
@@ -89,6 +96,40 @@ def login(body: LoginIn, request: Request, response: Response, tenant: TenantCtx
     )
     _no_store(response)
     return {"email": user.email, "csrf_token": csrf}
+
+
+# An iPhone home-screen app keeps its own cookies, so the owner would have to sign in again inside it.
+# A signed-in owner gets a short-lived code that goes into the installed icon's start URL and signs that app in once.
+INSTALL_CODE_TTL = 2 * 3600
+
+
+def _install_sig(tenant_id: int, user_id: int, exp: int) -> str:
+    return hmac.new(get_settings().secret_key.encode(), f"install|{tenant_id}|{user_id}|{exp}".encode(), hashlib.sha256).hexdigest()[:32]
+
+
+@router.post("/install-code")
+def install_code(response: Response, ctx: OwnerCtx = Depends(owner_dep)) -> dict:
+    _no_store(response)
+    exp = now_s() + INSTALL_CODE_TTL
+    return {"code": f"{ctx.user_id}.{exp}.{_install_sig(ctx.tenant.id, ctx.user_id, exp)}"}
+
+
+@router.post("/login-code")
+def login_code(body: InstallCodeIn, request: Request, response: Response, tenant: TenantCtx = Depends(tenant_dep)) -> dict:
+    limit_request(request, tenant.id, "login", 8, 600, per_tenant=60)
+    try:
+        uid_s, exp_s, sig = body.code.split(".")
+        uid, exp = int(uid_s), int(exp_s)
+    except ValueError:
+        raise HTTPException(401, {"code": "invalid_credentials"}) from None
+    if exp < now_s() or not hmac.compare_digest(sig, _install_sig(tenant.id, uid, exp)):
+        raise HTTPException(401, {"code": "invalid_credentials"})
+    with database.read_session() as db:
+        user = db.get(User, uid)
+        member = db.get(Membership, (uid, tenant.id)) if user else None
+    if not (user and member):
+        raise HTTPException(401, {"code": "invalid_credentials"})
+    return _start_session(response, user, tenant)
 
 
 @router.post("/logout", status_code=204)

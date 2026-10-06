@@ -4,7 +4,9 @@ import { getBase, getTenant } from "@/lib/server";
  *  "alex" does not capture "alexmotors"). src/proxy.ts sends /s/<slug> to /s/<slug>/. */
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   // ?app=owner: the owner cabinet is its own home-screen app (opens straight into the cabinet, where push is switched on)
-  const owner = new URL(req.url).searchParams.get("app") === "owner";
+  const qs = new URL(req.url).searchParams;
+  const owner = qs.get("app") === "owner";
+  const k = owner && /^[\w.-]{10,120}$/.test(qs.get("k") ?? "") ? qs.get("k") : null; // sign-in code for the iPhone app's first launch
   const { slug } = await params;
   const t = await getTenant(slug);
   if (!t) return new Response("Not found", { status: 404 });
@@ -17,7 +19,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     description: owner ? "Записи, расписание и уведомления владельца" : t.tagline,
     lang: "ru",
     dir: "ltr",
-    start_url: owner ? `${scope}owner?source=pwa` : `${scope}?source=pwa`,
+    start_url: owner ? `${scope}owner?source=pwa${k ? `&k=${k}` : ""}` : `${scope}?source=pwa`,
     scope,
     display: "standalone",
     orientation: "portrait",
@@ -34,6 +36,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
       : [{ name: "Записаться", url: `${scope}?book=1` }, { name: "Моя запись", url: `${scope}my` }],
   };
   return new Response(JSON.stringify(manifest), {
-    headers: { "Content-Type": "application/manifest+json; charset=utf-8", "Cache-Control": "public, max-age=300" },
+    headers: { "Content-Type": "application/manifest+json; charset=utf-8", "Cache-Control": k ? "no-store" : "public, max-age=300" },
   });
 }

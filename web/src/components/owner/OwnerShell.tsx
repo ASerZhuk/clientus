@@ -7,9 +7,10 @@ import { Skeleton } from "@astryxdesign/core/Skeleton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { AssistantSheet } from "@/components/client/AssistantSheet";
 import { AppPrompt, OwnerPushBanner } from "@/components/AppPrompt";
+import { isIos, isStandalone } from "@/lib/push";
 import { useStudio } from "@/components/StudioProviders";
 import { Input } from "@/components/ui/Input";
 import { api, ApiError, ownerApi, setCsrf } from "@/lib/api";
@@ -82,13 +83,40 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
   const me = useQuery({
     queryKey: ["owner-me", slug],
     queryFn: async () => {
-      const r = await api<Me>(`${ownerApi(slug)}/me`);
-      setCsrf(r.csrf_token);
-      return r;
+      // first launch of the iPhone home-screen app: its start URL carries a one-time sign-in code (?k=)
+      const k = new URLSearchParams(window.location.search).get("k");
+      try {
+        let r: Me;
+        try {
+          r = await api<Me>(`${ownerApi(slug)}/me`);
+        } catch (e) {
+          if (!(k && e instanceof ApiError && e.status === 401)) throw e;
+          const s = await api<{ csrf_token: string }>(`${ownerApi(slug)}/login-code`, { method: "POST", body: { code: k } });
+          setCsrf(s.csrf_token);
+          r = await api<Me>(`${ownerApi(slug)}/me`);
+        }
+        setCsrf(r.csrf_token);
+        return r;
+      } finally {
+        if (k) { const u = new URL(window.location.href); u.searchParams.delete("k"); history.replaceState(history.state, "", u); }
+      }
     },
     retry: false,
     staleTime: 5 * 60_000,
   });
+
+  // Safari on iPhone: put a sign-in code into the icon "Add to Home Screen" will create, so the installed app opens signed in
+  const [installCode, setInstallCode] = useState<string | null>(null);
+  useEffect(() => {
+    if (!me.data || installCode || isStandalone() || !isIos()) return;
+    api<{ code: string }>(`${ownerApi(slug)}/install-code`, { method: "POST" }).then((r) => setInstallCode(r.code)).catch(() => undefined);
+  }, [me.data, installCode, slug]);
+  useEffect(() => {
+    if (!installCode) return;
+    const u = new URL(window.location.href);
+    if (u.searchParams.get("k") !== installCode) { u.searchParams.set("k", installCode); history.replaceState(history.state, "", u); }
+    document.querySelector('link[rel="manifest"]')?.setAttribute("href", `${href("/manifest.webmanifest")}?app=owner&k=${encodeURIComponent(installCode)}`);
+  }, [installCode, path, href]);
 
   const logout = async () => {
     try { await api(`${ownerApi(slug)}/logout`, { method: "POST" }); } catch { /* session already gone */ }

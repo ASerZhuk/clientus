@@ -291,6 +291,9 @@
   .push-banner b { display: block; font-size: 15px; }
   .push-banner small { display: block; color: var(--muted); font-size: 13px; }
   .push-banner-x { width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .app-prompt-ios { margin: 0; font-size: 16px; line-height: 1.6; }
+  .app-prompt-ios svg { vertical-align: -3px; margin-inline: 2px; font-size: 20px; color: var(--studio-accent, #4690ff); }
+  .push-banner small svg { vertical-align: -2px; }
   .app-prompt-steps { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
 
   /* owner weekly hours: one compact row per day */
