@@ -2,20 +2,22 @@ import { getBase, getTenant } from "@/lib/server";
 
 /** Dynamic per studio: id, scope and start_url stay inside /s/<slug>/ (with the slash, so studios never overlap:
  *  "alex" does not capture "alexmotors"). src/proxy.ts sends /s/<slug> to /s/<slug>/. */
-export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
+  // ?app=owner: the owner cabinet is its own home-screen app (opens straight into the cabinet, where push is switched on)
+  const owner = new URL(req.url).searchParams.get("app") === "owner";
   const { slug } = await params;
   const t = await getTenant(slug);
   if (!t) return new Response("Not found", { status: 404 });
   const base = await getBase(slug);
   const scope = `${base}/`;
   const manifest = {
-    id: scope,
-    name: t.name,
-    short_name: t.name.length > 14 ? t.name.slice(0, 13).trimEnd() + "…" : t.name,
-    description: t.tagline,
+    id: owner ? `${scope}owner` : scope,
+    name: owner ? `${t.name} · Кабинет` : t.name,
+    short_name: owner ? "Кабинет" : t.name.length > 14 ? t.name.slice(0, 13).trimEnd() + "…" : t.name,
+    description: owner ? "Записи, расписание и уведомления владельца" : t.tagline,
     lang: "ru",
     dir: "ltr",
-    start_url: `${scope}?source=pwa`,
+    start_url: owner ? `${scope}owner?source=pwa` : `${scope}?source=pwa`,
     scope,
     display: "standalone",
     orientation: "portrait",
@@ -27,10 +29,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
       { src: t.pwa.icon512, sizes: "512x512", type: "image/png", purpose: "any" },
       { src: t.pwa.maskable512, sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
-    shortcuts: [
-      { name: "Записаться", url: `${scope}?book=1` },
-      { name: "Моя запись", url: `${scope}my` },
-    ],
+    shortcuts: owner
+      ? [{ name: "Расписание", url: `${scope}owner` }, { name: "Услуги", url: `${scope}owner/services` }]
+      : [{ name: "Записаться", url: `${scope}?book=1` }, { name: "Моя запись", url: `${scope}my` }],
   };
   return new Response(JSON.stringify(manifest), {
     headers: { "Content-Type": "application/manifest+json; charset=utf-8", "Cache-Control": "public, max-age=300" },

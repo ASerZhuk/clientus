@@ -55,13 +55,23 @@ export function OwnerPushBanner() {
   const p = useOwnerPush();
   const [hidden, setHidden] = useState(true);
   useEffect(() => { try { setHidden(Date.now() - Number(localStorage.getItem(key) || 0) < 86_400_000); } catch { setHidden(false); } }, [key]);
-  if (hidden || !p.known || p.on || p.support?.state !== "ready") return null;
+  if (hidden || !p.known || p.on) return null;
+  const close = () => { try { localStorage.setItem(key, String(Date.now())); } catch { /* private mode */ } setHidden(true); };
+  if (p.support?.state === "ios-install")
+    return (
+      <div className="push-banner" role="region" aria-label="Уведомления">
+        <BellRinging size={22} weight="fill" aria-hidden />
+        <span className="grow"><b>Уведомления на iPhone</b><small>Нажмите «Поделиться» → «На экран Домой», откройте кабинет с новой иконки и войдите — там появится кнопка «Включить».</small></span>
+        <button type="button" className="push-banner-x" aria-label="Скрыть на сегодня" onClick={close}>×</button>
+      </div>
+    );
+  if (p.support?.state !== "ready") return null;
   return (
     <div className="push-banner" role="region" aria-label="Уведомления">
       <BellRinging size={22} weight="fill" aria-hidden />
       <span className="grow"><b>Включите уведомления</b><small>{p.error || "Узнаете о новой записи, переносе и отмене сразу."}</small></span>
       <Button label="Включить" size="sm" variant="primary" isLoading={p.busy} onClick={() => p.enable()} />
-      <button type="button" className="push-banner-x" aria-label="Скрыть на сегодня" onClick={() => { try { localStorage.setItem(key, String(Date.now())); } catch { /* private mode */ } setHidden(true); }}>×</button>
+      <button type="button" className="push-banner-x" aria-label="Скрыть на сегодня" onClick={close}>×</button>
     </div>
   );
 }
