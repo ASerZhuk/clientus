@@ -291,6 +291,9 @@
   .push-banner b { display: block; font-size: 15px; }
   .push-banner small { display: block; color: var(--muted); font-size: 13px; }
   .push-banner-x { width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .inapp-bar { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 12px; padding: calc(10px + var(--safe-t)) 16px 10px; background: var(--cream, #efe5d3); color: #17130d; font-size: 14px; line-height: 1.35; }
+  .inapp-bar span { flex: 1; }
+  .inapp-bar button { display: inline-flex; align-items: center; gap: 6px; flex: none; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #17130d; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
   .app-prompt-ios { margin: 0; font-size: 16px; line-height: 1.6; }
   .app-prompt-ios svg { vertical-align: -3px; margin-inline: 2px; font-size: 20px; color: var(--studio-accent, #4690ff); }
   .push-banner small svg { vertical-align: -2px; }

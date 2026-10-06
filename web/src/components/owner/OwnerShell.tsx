@@ -11,6 +11,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { AssistantSheet } from "@/components/client/AssistantSheet";
 import { AppPrompt, OwnerPushBanner } from "@/components/AppPrompt";
 import { isIos, isStandalone } from "@/lib/push";
+import { InAppBrowserBar } from "@/components/InAppBrowser";
 import { useStudio } from "@/components/StudioProviders";
 import { Input } from "@/components/ui/Input";
 import { api, ApiError, ownerApi, setCsrf } from "@/lib/api";
@@ -141,6 +142,7 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
   return (
     <OwnerCtx.Provider value={{ email: me.data.email, logout, subscription: me.data.subscription }}>
       <div className="studio-owner">
+        <InAppBrowserBar />
         <OwnerHeader />
         <div className="page notice"><SubscriptionBanner sub={me.data.subscription} /><OwnerPushBanner /></div>
         {children}

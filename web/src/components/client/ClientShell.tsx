@@ -1,6 +1,7 @@
 "use client";
 
 import { AppPrompt } from "@/components/AppPrompt";
+import { InAppBrowserBar } from "@/components/InAppBrowser";
 import { UserCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { createContext, useCallback, useContext, useState } from "react";
@@ -41,6 +42,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
     <AssistantCtx.Provider value={{ open }}>
       <BookingProvider>
         <div className="studio" data-profile={tenant.profile.type}>
+          <InAppBrowserBar />
           <AppHeader />
           {tenant.is_preview && (
             <p className="page muted preview-note" style={{ margin: "10px auto 0", fontSize: 13 }}>
