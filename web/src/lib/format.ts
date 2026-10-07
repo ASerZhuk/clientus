@@ -10,6 +10,11 @@ export function formatMoney(minor: number, currency = "RUB"): string {
   return `${text}\u00a0${CURRENCY[currency] ?? currency}`;
 }
 
+/** A service price: 0 means a free visit (inspection, consultation), shown as such rather than "0 ₽". */
+export function formatPrice(minor: number, currency = "RUB"): string {
+  return minor === 0 ? "Бесплатно" : formatMoney(minor, currency);
+}
+
 /** minor units <-> the number a person types (major units) */
 export const toMinor = (major: number) => Math.round(major * 100);
 export const toMajor = (minor: number) => minor / 100;

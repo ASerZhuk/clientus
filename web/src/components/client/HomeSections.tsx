@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useProfile, useStudio, useVocab } from "@/components/StudioProviders";
 import { Reveal } from "@/components/ui/Reveal";
-import { formatDurationShort, formatMoney, telHref, todayKey } from "@/lib/format";
+import { formatDurationShort, formatMoney, formatPrice, telHref, todayKey } from "@/lib/format";
 import { useMounted } from "@/lib/hooks";
 import { useInstall } from "@/lib/install";
 import { useBooking } from "./BookingProvider";
@@ -38,7 +38,7 @@ function fillTokens(text: string, tenant: Tenant): string {
     .replace(/\{(services|resources)_word:([^|}]+)\|([^|}]+)\|([^}]+)\}/g, (_m, k: string, a: string, b: string, c: string) => word(counts[k], [a, b, c]))
     .replace("{services}", String(tenant.services.length))
     .replace("{resources}", String(tenant.resources_count))
-    .replace("{min_price}", prices.length ? formatMoney(Math.min(...prices), tenant.currency) : "—");
+    .replace("{min_price}", prices.length ? formatPrice(Math.min(...prices), tenant.currency) : "—");
 }
 
 /** Full-screen photo opener: brand bar on top, name, status and the one light action at the bottom. */
@@ -127,7 +127,7 @@ function ServiceList({ limit }: { limit: number }) {
           <li key={s.id}>
             <button type="button" disabled={!s.bookable} onClick={() => booking.open({ serviceId: s.id })}>
               <span className="grow"><b>{s.name}</b><small>{formatDurationShort(s.duration_min)}</small></span>
-              <span className="svc-price">{s.price_varies ? "от " : ""}{formatMoney(s.price_minor, tenant.currency)}</span>
+              <span className="svc-price">{s.price_varies && s.price_minor ? "от " : ""}{formatPrice(s.price_minor, tenant.currency)}</span>
               <CaretRight size={18} aria-hidden />
             </button>
           </li>
@@ -257,7 +257,7 @@ export function ServicesPanel({ limit, withHeading = true }: { limit?: number; w
               <div className="name">{s.name}</div>
               <div className="meta">{s.duration_varies ? "" : ""}{formatDurationShort(s.duration_min)}{!withHeading && s.description ? ` — ${s.description}` : ""}</div>
             </span>
-            <span className="side"><div className="price">{s.price_varies ? "от " : ""}{formatMoney(s.price_minor, tenant.currency)}</div>{withHeading && <div className="choose">Выбрать</div>}</span>
+            <span className="side"><div className="price">{s.price_varies && s.price_minor ? "от " : ""}{formatPrice(s.price_minor, tenant.currency)}</div>{withHeading && <div className="choose">Выбрать</div>}</span>
             <ArrowUpRight size={22} aria-hidden />
           </button>
         ))}

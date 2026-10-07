@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useStudio, useVocab } from "@/components/StudioProviders";
 import { api, ApiError, studioApi } from "@/lib/api";
-import { formatDuration, formatMoney, longDayLabel, shownStatus, telHref, timeOf } from "@/lib/format";
+import { formatDuration, formatMoney, formatPrice, longDayLabel, shownStatus, telHref, timeOf } from "@/lib/format";
 import { addToCalendar } from "@/lib/ics";
 import { detectPush, deniedHelp, onPermissionMaybeChanged, subscribePush, currentEndpoint, type PushSupport } from "@/lib/push";
 import type { ClientBooking, PushConfig } from "@/lib/types";
@@ -111,7 +111,7 @@ export function BookingDetails({ booking, token, onChanged }: { booking: ClientB
           <div><dt>Длительность</dt><dd>{formatDuration(booking.end_min - booking.start_min)}</dd></div>
           {booking.post_name && <div><dt>{vocab("resource_one").replace(/^./, (c) => c.toUpperCase())}</dt><dd>{booking.post_name}</dd></div>}
           {booking.car && <div><dt>Автомобиль</dt><dd>{booking.car}{booking.plate ? ` · ${booking.plate}` : ""}</dd></div>}
-          <div><dt>Стоимость</dt><dd>{formatMoney(booking.price_minor, tenant.currency)}</dd></div>
+          <div><dt>Стоимость</dt><dd>{formatPrice(booking.price_minor, tenant.currency)}</dd></div>
         </dl>
       </div>
       {!cancelled && (

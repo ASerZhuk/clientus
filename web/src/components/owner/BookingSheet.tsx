@@ -11,7 +11,7 @@ import { useStudio, useVocab } from "@/components/StudioProviders";
 import { AppSheet } from "@/components/ui/AppSheet";
 import { NativeField } from "@/components/ui/Native";
 import { api, ApiError, ownerApi } from "@/lib/api";
-import { dateKeyOf, formatDuration, formatMoney, formatPhone, localToMinute, longDayLabel, shownStatus, telHref, timeOf } from "@/lib/format";
+import { dateKeyOf, formatDuration, formatMoney, formatPrice, formatPhone, localToMinute, longDayLabel, shownStatus, telHref, timeOf } from "@/lib/format";
 import type { OwnerBooking } from "@/lib/types";
 import { refreshSchedule } from "./invalidate";
 
@@ -78,7 +78,7 @@ export function BookingSheet({ bookingId, onClose }: { bookingId: number | null;
             <div><dt>Телефон</dt><dd><a href={telHref(b.client_phone)}>{formatPhone(b.client_phone)}</a></dd></div>
             {(b.car || tenant.profile.contact.car !== "hidden") && <div><dt>Автомобиль</dt><dd>{b.car || "—"}{b.plate ? ` · ${b.plate}` : ""}</dd></div>}
             {b.note && <div><dt>Комментарий</dt><dd>{b.note}</dd></div>}
-            <div><dt>Цена (на момент записи)</dt><dd>{formatMoney(b.price_minor, tenant.currency)}</dd></div>
+            <div><dt>Цена (на момент записи)</dt><dd>{formatPrice(b.price_minor, tenant.currency)}</dd></div>
           </dl>
           {b.client_phone && <Button label="Позвонить клиенту" icon={<Phone weight="fill" />} href={telHref(b.client_phone)} variant="secondary" width="100%" />}
           {msg && <Banner status={msg.ok ? "success" : "error"} title={msg.text} />}

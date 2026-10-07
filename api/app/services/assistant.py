@@ -43,6 +43,11 @@ def money(minor: int, currency: str) -> str:
     return f"{whole} {CURRENCY.get(currency, currency)}"
 
 
+def price_text(minor: int, currency: str) -> str:
+    """A service price: 0 is a free visit (inspection, consultation)."""
+    return "бесплатно" if minor == 0 else money(minor, currency)
+
+
 def when_text(start_min: int, tz: ZoneInfo, today: date) -> str:
     dt = min_to_dt(start_min, tz)
     d = dt.date()
@@ -196,7 +201,7 @@ def _client_answer(intent: str, parsed: intents.Parsed, ctx: dict, reads: Public
         lines = [f"• {m.name}" + (f" — {m.description}" if m.description else "") for m in masters]
         return Reply("answered", "У нас принимают:\n" + "\n".join(lines), intent, items=[{"name": m.name, "description": m.description} for m in masters])
     if intent == "services_list":
-        items = [{"name": v.name, "price": money(v.price_minor, cur), "duration_min": v.duration_min} for v in reads.services()]
+        items = [{"name": v.name, "price": price_text(v.price_minor, cur), "duration_min": v.duration_min} for v in reads.services()]
         text = "Наши услуги:\n" + "\n".join(f"• {i['name']} — {i['price']}" for i in items) if items else "Пока нет доступных услуг."
         return Reply("answered", text + ("\nВыберите услугу — покажу цену и время." if items else ""), intent, items=items, options=_service_options("price", reads.services()) if items else None)
     if intent == "address":
@@ -217,7 +222,7 @@ def _client_answer(intent: str, parsed: intents.Parsed, ctx: dict, reads: Public
         return ask
     assert service is not None
     if intent == "price":
-        return Reply("answered", f"«{service.name}» — {money(service.price_minor, cur)}. Занимает около {_duration(service.duration_min)}.", intent,
+        return Reply("answered", f"«{service.name}» — {price_text(service.price_minor, cur)}. Занимает около {_duration(service.duration_min)}.", intent,
                      action={"type": "book", "service_id": service.id})
     if intent == "duration":
         return Reply("answered", f"«{service.name}» занимает около {_duration(service.duration_min)}.", intent)
@@ -456,7 +461,7 @@ def _booking_flow(text: str, parsed: intents.Parsed, ctx: dict, reads: PublicRea
         local = min_to_dt(m, reads.tz)
         return window[0] <= local.hour * 60 + local.minute < window[1]
 
-    head = f"«{service.name}» — {money(service.price_minor, reads.settings.currency)}, занимает {_duration(service.duration_min)}."
+    head = f"«{service.name}» — {price_text(service.price_minor, reads.settings.currency)}, занимает {_duration(service.duration_min)}."
     picked: list[int] = []
     note = ""
     if day is not None:

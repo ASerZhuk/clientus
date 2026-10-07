@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { NativeField } from "@/components/ui/Native";
 import { api, ApiError, ownerApi } from "@/lib/api";
 import { useDoParam } from "@/lib/hooks";
-import { WEEKDAYS_SHORT, formatDurationShort, formatMoney, hhmmToMin, minToHhmm, toMajor, toMinor } from "@/lib/format";
+import { WEEKDAYS_SHORT, formatDurationShort, formatMoney, formatPrice, hhmmToMin, minToHhmm, toMajor, toMinor } from "@/lib/format";
 import { fieldErrors, serviceSchema } from "@/lib/schemas";
 import type { DayEdit, ExceptionEdit, OwnerCatalog, OwnerResource, OwnerService } from "@/lib/types";
 
@@ -232,7 +232,7 @@ export function ServicesEditor() {
           {q.data.services.map((s) => (
             <button key={s.id} type="button" className="service-row" onClick={() => setTarget(s)} style={s.is_active ? undefined : { opacity: 0.5 }}>
               <span className="grow"><div className="service-name">{s.name}{s.is_active ? "" : " · скрыта"}</div><div className="service-desc">{formatDurationShort(s.duration_min)}{s.buffer_min ? ` · подготовка ${s.buffer_min} мин` : ""}{tenant.profile.features.choose_resource ? ` · ${s.offers.length} мастеров` : ""}</div></span>
-              <span className="price">{formatMoney(s.price_minor, tenant.currency)}</span>
+              <span className="price">{formatPrice(s.price_minor, tenant.currency)}</span>
               <PencilSimple size={18} aria-hidden />
             </button>
           ))}

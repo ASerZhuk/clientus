@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/Input";
 import { api, ApiError, studioApi } from "@/lib/api";
 import { navigateFromSheet } from "@/lib/hooks";
 import { saveBooking } from "@/lib/booking-store";
-import { dateKeyOf, dayNumber, newKey, formatDuration, formatDurationShort, formatMoney, fullDateLabel, longDayLabel, monthShort, timeOf, weekdayShort } from "@/lib/format";
+import { dateKeyOf, dayNumber, newKey, formatDuration, formatDurationShort, formatMoney, formatPrice, fullDateLabel, longDayLabel, monthShort, timeOf, weekdayShort } from "@/lib/format";
 import { contactSchemaFor, fieldErrors } from "@/lib/schemas";
 import type { CreatedBooking, SlotsResponse } from "@/lib/types";
 import { BookingDetails } from "./BookingDetails";
@@ -179,7 +179,7 @@ export function BookingSheet({ isOpen, onClose, preset }: { isOpen: boolean; onC
             <button key={s.id} type="button" role="radio" aria-checked={serviceId === s.id} className="svc-row"
               onClick={() => { if (serviceId !== s.id) { setServiceId(s.id); setDateKey(null); setSlot(null); setResourceId(null); } go(profile.features.choose_resource ? "master" : "date"); }}>
               <span className="grow"><div className="name">{s.name}</div><div className="meta">{formatDurationShort(s.duration_min)}</div></span>
-              <span className="side"><div className="price">{s.price_varies ? "от " : ""}{formatMoney(s.price_minor, tenant.currency)}</div><div className="choose">Выбрать</div></span>
+              <span className="side"><div className="price">{s.price_varies && s.price_minor ? "от " : ""}{formatPrice(s.price_minor, tenant.currency)}</div><div className="choose">Выбрать</div></span>
               <ArrowUpRight size={22} aria-hidden />
             </button>
           ))}
@@ -191,7 +191,7 @@ export function BookingSheet({ isOpen, onClose, preset }: { isOpen: boolean; onC
         <div className="svc-panel" role="radiogroup" aria-label={vocab("resource_one")}>
           <button type="button" role="radio" aria-checked={resourceId === null} className="svc-row" onClick={() => { setResourceId(null); setDateKey(null); setSlot(null); go("date"); }}>
             <span className="grow"><div className="name">Любой свободный</div><div className="meta">Подберём ближайшее время</div></span>
-            <span className="side"><div className="price">{service.price_varies ? "от " : ""}{formatMoney(service.price_minor, tenant.currency)}</div></span>
+            <span className="side"><div className="price">{service.price_varies && service.price_minor ? "от " : ""}{formatPrice(service.price_minor, tenant.currency)}</div></span>
             <ArrowUpRight size={22} aria-hidden />
           </button>
           {masters.map((m) => {
@@ -200,7 +200,7 @@ export function BookingSheet({ isOpen, onClose, preset }: { isOpen: boolean; onC
               <button key={m.id} type="button" role="radio" aria-checked={resourceId === m.id} className="svc-row" onClick={() => { setResourceId(m.id); setDateKey(null); setSlot(null); go("date"); }}>
                 <span className="avatar">{m.photo_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={m.photo_url} alt="" /> : m.name.slice(0, 1)}</span>
                 <span className="grow"><div className="name">{m.name}</div><div className="meta">{m.description || formatDurationShort(o.duration_min)}</div></span>
-                <span className="side"><div className="price">{formatMoney(o.price_minor, tenant.currency)}</div><div className="choose">{formatDurationShort(o.duration_min)}</div></span>
+                <span className="side"><div className="price">{formatPrice(o.price_minor, tenant.currency)}</div><div className="choose">{formatDurationShort(o.duration_min)}</div></span>
                 <ArrowUpRight size={22} aria-hidden />
               </button>
             );
@@ -257,7 +257,7 @@ export function BookingSheet({ isOpen, onClose, preset }: { isOpen: boolean; onC
             <div><dt>Услуга</dt><dd>{service.name}</dd></div>
             {profile.features.choose_resource && <div><dt>Мастер</dt><dd>{resourceId !== null ? tenant.resources.find((r) => r.id === resourceId)?.name : "любой свободный"}</dd></div>}
             <div><dt>Когда</dt><dd>{longDayLabel(slot, tz)}, {timeOf(slot, tz)}</dd></div>
-            <div><dt>Стоимость</dt><dd>{formatMoney(price, tenant.currency)}</dd></div>
+            <div><dt>Стоимость</dt><dd>{formatPrice(price, tenant.currency)}</dd></div>
           </dl>
           <Input label="Имя" name="name" autoComplete="name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} error={errors.name} />
           <Input label="Телефон" name="tel" inputMode="tel" autoComplete="tel" placeholder="+7 900 123-45-67" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} error={errors.phone} />
