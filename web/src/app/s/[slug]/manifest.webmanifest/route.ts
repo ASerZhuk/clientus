@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
   const manifest = {
     id: owner ? `${scope}owner` : scope,
     name: owner ? `${t.name} · Кабинет` : t.name,
-    short_name: owner ? "Кабинет" : t.name.length > 14 ? t.name.slice(0, 13).trimEnd() + "…" : t.name,
+    short_name: t.name.length > 14 ? t.name.slice(0, 13).trimEnd() + "…" : t.name,
     description: owner ? "Записи, расписание и уведомления владельца" : t.tagline,
     lang: "ru",
     dir: "ltr",

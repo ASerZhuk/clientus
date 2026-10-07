@@ -55,7 +55,6 @@ export function Hero() {
         <Link href={href("/account")} className="glass-round" aria-label="Профиль"><User size={20} aria-hidden /></Link>
       </div>
       <div className="hero-foot">
-        {tenant.is_preview && <p className="hero-note">Образец: данные демонстрационные, уведомления не отправляются.</p>}
         <p className="hero-meta">
           {day && <span className={`status ${open ? "on" : ""}`}><i aria-hidden />{open ? `Открыто до ${day.close}` : "Сегодня закрыто"}</span>}
           {tenant.address && <span>{tenant.address.split(",")[0]}</span>}

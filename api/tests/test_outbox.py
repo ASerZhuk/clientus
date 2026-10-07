@@ -51,7 +51,8 @@ def test_booking_writes_owner_and_reminder_jobs_once(app_db, tmp_path):
     assert reminder.run_at == (local_start(3, 10) - 24 * 60) * 60 and reminder.dedupe_key == f"reminder:{bid}:{local_start(3, 10)}"
 
 
-def test_preview_tenant_sends_nothing(app_db, tmp_path):
+def test_unsold_studio_notifies_like_a_live_one(app_db, tmp_path):
+    """A studio sent to a prospect before purchase works for real: the prospect tries it and gets the pushes."""
     setup_tenant(tmp_path)
     tid = ctx()
     with database.write_session() as db:
@@ -62,7 +63,7 @@ def test_preview_tenant_sends_nothing(app_db, tmp_path):
 
         svc = db.scalar(select(Service))
         bk.create_booking(db, tenant_id=tid, settings=settings, is_preview=True, service_id=svc.id, start_min=local_start(3, 10), name="D", phone="+7 900 000-00-00", now_min=NOW)
-    assert jobs(tid) == []
+    assert {j.kind for j in jobs(tid)} >= {"new", "reminder"}
 
 
 def test_worker_delivers_owner_and_client_pushes(app_db, tmp_path):

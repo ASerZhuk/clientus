@@ -171,7 +171,7 @@ def process(job_id: int, sender: Sender = real_sender, now: int | None = None) -
             origin_of = {s.id: s.origin for s in rows}
             badges = unseen_for_owners(db, job.tenant_id, set(owner_of.values())) if job.audience == "owner" and owner_of else {}
         skip_reason = None
-        if booking is None or tenant is None or tenant.status != "active":
+        if booking is None or tenant is None or tenant.status not in ("active", "preview"):
             skip_reason = "not_active"
         elif job.kind != "cancelled" and booking.status == "cancelled":
             skip_reason = "booking_cancelled"

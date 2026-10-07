@@ -194,7 +194,7 @@ def my_cancel(response: Response, booking_id: int = Depends(client_booking_id), 
 @router.get("/s/{slug}/push/config")
 def push_config(tenant: TenantCtx = Depends(tenant_dep)) -> dict:
     """Honest capability report: the UI never promises push the server cannot deliver."""
-    return {"enabled": push.vapid_configured() and not tenant.is_preview, "public_key": get_settings().vapid_public_key or None, "preview": tenant.is_preview}
+    return {"enabled": push.vapid_configured(), "public_key": get_settings().vapid_public_key or None, "preview": False}
 
 
 @router.post("/s/{slug}/my/push", status_code=204)

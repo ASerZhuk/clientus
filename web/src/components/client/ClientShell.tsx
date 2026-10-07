@@ -44,16 +44,11 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
         <div className="studio" data-profile={tenant.profile.type}>
           <InAppBrowserBar />
           <AppHeader />
-          {tenant.is_preview && (
-            <p className="page muted preview-note" style={{ margin: "10px auto 0", fontSize: 13 }}>
-              Образец: данные демонстрационные, уведомления не отправляются.
-            </p>
-          )}
           {children}
         </div>
         <BottomNav onAssistant={() => open()} />
         <AssistantSheet slug={slug} audience="client" autoAsk={seed} isOpen={assistantOpen} onClose={() => setAssistantOpen(false)} />
-        {!tenant.is_preview && <AppPrompt audience="client" />}
+        <AppPrompt audience="client" />
       </BookingProvider>
     </AssistantCtx.Provider>
   );

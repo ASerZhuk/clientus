@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: "Кабинет",
     robots: { index: false, follow: false },
     manifest: `${base}/manifest.webmanifest?app=owner`,
-    appleWebApp: { capable: true, title: t ? `${t.name} · Кабинет` : "Кабинет", statusBarStyle: "black-translucent" },
+    appleWebApp: { capable: true, title: t?.name ?? "Кабинет", statusBarStyle: "black-translucent" },
   };
 }
 

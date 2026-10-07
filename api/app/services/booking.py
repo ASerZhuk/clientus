@@ -188,8 +188,8 @@ def create_booking(
 
     if idempotency_key:
         db.add(IdempotencyKey(tenant_id=tenant_id, scope=scope, key=idempotency_key, request_hash=fingerprint, booking_id=booking.id))
-    if not is_preview:
-        _schedule_notifications(db, tenant_id, settings, booking, notify_owner=(source == "client"))
+    # a not-yet-sold studio works for real too: the prospect tries it and gets the notifications
+    _schedule_notifications(db, tenant_id, settings, booking, notify_owner=(source == "client"))
     return BookingResult(booking, True, token)
 
 
@@ -260,12 +260,11 @@ def reschedule_booking(
     booking.resource_id = target.id
     booking.start_min = new_start_min
     booking.end_min = new_start_min + duration
-    if not is_preview:
-        outbox.skip_pending(db, booking.id, ("reminder",))
-        _schedule_notifications(db, tenant_id, settings, booking, notify_owner=False)
-        outbox.enqueue(
-            db, tenant_id, booking_id=booking.id, audience="client", kind="moved", dedupe_key=f"moved:{booking.id}:{new_start_min}"
-        )
+    outbox.skip_pending(db, booking.id, ("reminder",))
+    _schedule_notifications(db, tenant_id, settings, booking, notify_owner=False)
+    outbox.enqueue(
+        db, tenant_id, booking_id=booking.id, audience="client", kind="moved", dedupe_key=f"moved:{booking.id}:{new_start_min}"
+    )
     return booking
 
 
@@ -295,16 +294,15 @@ def cancel_booking(
     booking.status = "cancelled"
     booking.cancelled_at = now_s()
     booking.cancelled_by = by
-    if not is_preview:
-        outbox.skip_pending(db, booking.id, ("reminder", "moved"))
-        outbox.enqueue(
-            db,
-            tenant_id,
-            booking_id=booking.id,
-            audience="owner" if by == "client" else "client",
-            kind="cancelled",
-            dedupe_key=f"cancelled:{booking.id}",
-        )
+    outbox.skip_pending(db, booking.id, ("reminder", "moved"))
+    outbox.enqueue(
+        db,
+        tenant_id,
+        booking_id=booking.id,
+        audience="owner" if by == "client" else "client",
+        kind="cancelled",
+        dedupe_key=f"cancelled:{booking.id}",
+    )
     return booking
 
 
