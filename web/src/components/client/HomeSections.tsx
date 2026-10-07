@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { ArrowRight, ArrowUpRight, CaretRight, DownloadSimple, Export, MapPin, NavigationArrow, Phone, User, X } from "@phosphor-icons/react";
 import { useState } from "react";
 import Image from "next/image";
@@ -50,7 +51,7 @@ export function Hero() {
     <section className="hero" id="hero">
       {tenant.hero_url && <Image className="hero-photo" src={tenant.hero_url} alt="" fill priority sizes="100vw" unoptimized />}
       <div className="hero-bar">
-        <span className="hero-logo">{tenant.logo_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={tenant.logo_url} alt="" /> : tenant.name.slice(0, 1)}</span>
+        <BrandLogo className="hero-logo" src={tenant.logo_url} name={tenant.name} />
         <span className="grow" />
         <Link href={href("/account")} className="glass-round" aria-label="Профиль"><User size={20} aria-hidden /></Link>
       </div>
