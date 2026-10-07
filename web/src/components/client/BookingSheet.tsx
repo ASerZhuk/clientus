@@ -179,7 +179,7 @@ export function BookingSheet({ isOpen, onClose, preset }: { isOpen: boolean; onC
             <button key={s.id} type="button" role="radio" aria-checked={serviceId === s.id} className="svc-row"
               onClick={() => { if (serviceId !== s.id) { setServiceId(s.id); setDateKey(null); setSlot(null); setResourceId(null); } go(profile.features.choose_resource ? "master" : "date"); }}>
               <span className="grow"><div className="name">{s.name}</div><div className="meta">{formatDurationShort(s.duration_min)}</div></span>
-              <span className="side"><div className="price">{s.price_varies && s.price_minor && s.price_kind !== "from" ? "от " : ""}{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</div><div className="choose">Выбрать</div></span>
+              <span className="side"><div className={`price${s.price_kind === "on_request" ? " on-request" : ""}`}>{s.price_varies && s.price_minor && s.price_kind !== "from" ? "от " : ""}{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</div><div className="choose">Выбрать</div></span>
               <ArrowUpRight size={22} aria-hidden />
             </button>
           ))}

@@ -257,7 +257,7 @@ export function ServicesPanel({ limit, withHeading = true }: { limit?: number; w
               <div className="name">{s.name}</div>
               <div className="meta">{s.duration_varies ? "" : ""}{formatDurationShort(s.duration_min)}{!withHeading && s.description ? ` — ${s.description}` : ""}</div>
             </span>
-            <span className="side"><div className="price">{s.price_varies && s.price_minor && s.price_kind !== "from" ? "от " : ""}{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</div>{withHeading && <div className="choose">Выбрать</div>}</span>
+            <span className="side"><div className={`price${s.price_kind === "on_request" ? " on-request" : ""}`}>{s.price_varies && s.price_minor && s.price_kind !== "from" ? "от " : ""}{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</div>{withHeading && <div className="choose">Выбрать</div>}</span>
             <ArrowUpRight size={22} aria-hidden />
           </button>
         ))}
