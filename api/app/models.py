@@ -196,6 +196,8 @@ class Service(TenantScoped, Base):
     name: Mapped[str] = mapped_column(String(120))
     description: Mapped[str] = mapped_column(Text, default="")
     price_minor: Mapped[int] = mapped_column(Integer)
+    # how the price reads, exactly as the studio states it: "exact" 1 500 ₽ | "from" от 1 500 ₽ | "on_request" по договорённости
+    price_kind: Mapped[str] = mapped_column(String(12), default="exact", server_default="exact")
     duration_min: Mapped[int] = mapped_column(Integer)
     buffer_min: Mapped[int] = mapped_column(Integer, default=0)
     keywords: Mapped[list] = mapped_column(JSON, default=list)

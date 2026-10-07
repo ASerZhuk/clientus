@@ -10,8 +10,10 @@ export function formatMoney(minor: number, currency = "RUB"): string {
   return `${text}\u00a0${CURRENCY[currency] ?? currency}`;
 }
 
-/** A service price: 0 means a free visit (inspection, consultation), shown as such rather than "0 ₽". */
-export function formatPrice(minor: number, currency = "RUB"): string {
+/** A service price as the studio states it: "по договорённости", "от …", or exact (0 = a free visit). */
+export function formatPrice(minor: number, currency = "RUB", kind: "exact" | "from" | "on_request" = "exact"): string {
+  if (kind === "on_request") return "По договорённости";
+  if (kind === "from") return `от ${formatMoney(minor, currency)}`;
   return minor === 0 ? "Бесплатно" : formatMoney(minor, currency);
 }
 

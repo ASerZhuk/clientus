@@ -111,7 +111,7 @@ export function BookingDetails({ booking, token, onChanged }: { booking: ClientB
           <div><dt>Длительность</dt><dd>{formatDuration(booking.end_min - booking.start_min)}</dd></div>
           {booking.post_name && <div><dt>{vocab("resource_one").replace(/^./, (c) => c.toUpperCase())}</dt><dd>{booking.post_name}</dd></div>}
           {booking.car && <div><dt>Автомобиль</dt><dd>{booking.car}{booking.plate ? ` · ${booking.plate}` : ""}</dd></div>}
-          <div><dt>Стоимость</dt><dd>{formatPrice(booking.price_minor, tenant.currency)}</dd></div>
+          <div><dt>Стоимость</dt><dd>{formatPrice(booking.price_minor, tenant.currency, booking.price_kind)}</dd></div>
         </dl>
       </div>
       {!cancelled && (

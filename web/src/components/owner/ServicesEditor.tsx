@@ -11,12 +11,12 @@ import { Button } from "@/components/ui/Pill";
 import { useStudio, useVocab } from "@/components/StudioProviders";
 import { AppSheet } from "@/components/ui/AppSheet";
 import { Input } from "@/components/ui/Input";
-import { NativeField } from "@/components/ui/Native";
+import { NativeField, NativeSelect } from "@/components/ui/Native";
 import { api, ApiError, ownerApi } from "@/lib/api";
 import { useDoParam } from "@/lib/hooks";
 import { WEEKDAYS_SHORT, formatDurationShort, formatMoney, formatPrice, hhmmToMin, minToHhmm, toMajor, toMinor } from "@/lib/format";
 import { fieldErrors, serviceSchema } from "@/lib/schemas";
-import type { DayEdit, ExceptionEdit, OwnerCatalog, OwnerResource, OwnerService } from "@/lib/types";
+import type { DayEdit, ExceptionEdit, OwnerCatalog, OwnerResource, OwnerService, PriceKind } from "@/lib/types";
 
 const cap = (w: string) => w.replace(/^./, (c) => c.toUpperCase());
 
@@ -31,6 +31,7 @@ const emptyForm = (resources: OwnerResource[]) => ({
   name: "",
   description: "",
   price: "",
+  price_kind: "exact" as PriceKind,
   duration_min: "60",
   buffer_min: "0",
   is_active: true,
@@ -57,20 +58,20 @@ function ServiceSheet({ target, catalog, onClose }: { target: OwnerService | "ne
       const o = target.offers.find((x) => x.resource_id === r.id);
       offers[r.id] = { on: Boolean(o), price: o?.price_minor != null ? String(toMajor(o.price_minor)) : "", duration: o?.duration_min != null ? String(o.duration_min) : "" };
     }
-    setF({ id: target.id, name: target.name, description: target.description, price: String(toMajor(target.price_minor)), duration_min: String(target.duration_min), buffer_min: String(target.buffer_min), is_active: target.is_active, offers });
+    setF({ id: target.id, name: target.name, description: target.description, price: String(toMajor(target.price_minor)), price_kind: target.price_kind ?? "exact", duration_min: String(target.duration_min), buffer_min: String(target.buffer_min), is_active: target.is_active, offers });
   }, [target]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const save = useMutation({
     mutationFn: () => {
       const chosen = resources.filter((r) => f.offers[r.id]?.on).map((r) => r.id);
-      const parsed = serviceSchema.safeParse({ name: f.name, description: f.description, price: Number(f.price.replace(",", ".")), duration_min: Number(f.duration_min), buffer_min: Number(f.buffer_min), resource_ids: chosen, is_active: f.is_active });
+      const parsed = serviceSchema.safeParse({ name: f.name, description: f.description, price: f.price_kind === "on_request" ? 0 : Number(f.price.replace(",", ".")), duration_min: Number(f.duration_min), buffer_min: Number(f.buffer_min), resource_ids: chosen, is_active: f.is_active });
       if (!parsed.success) throw new ApiError(422, "validation_error", fieldErrors(parsed.error));
       const { price, resource_ids, ...rest } = parsed.data;
       const offers = chosen.map((id) => {
         const o = f.offers[id];
         return { resource_id: id, price_minor: perResourcePrices && o.price.trim() ? toMinor(Number(o.price.replace(",", "."))) : null, duration_min: perResourcePrices && o.duration.trim() ? Number(o.duration) : null };
       });
-      const body = { ...rest, price_minor: toMinor(price), keywords: [] as string[], resource_ids, offers };
+      const body = { ...rest, price_minor: toMinor(price), price_kind: f.price_kind, keywords: [] as string[], resource_ids, offers };
       return target === "new" ? api(`${ownerApi(slug)}/services`, { method: "POST", body }) : api(`${ownerApi(slug)}/services/${f.id}`, { method: "PUT", body });
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["owner-services", slug] }); qc.invalidateQueries({ queryKey: ["tenant", slug] }); onClose(); },
@@ -82,7 +83,8 @@ function ServiceSheet({ target, catalog, onClose }: { target: OwnerService | "ne
       <Input label="Название" value={f.name} onChange={(v) => setF({ ...f, name: v })} error={errors.name} />
       <Input label="Описание" isOptional value={f.description} onChange={(v) => setF({ ...f, description: v })} />
       <div className="two">
-        <NativeField label={`Цена, ${tenant.currency}`} inputMode="decimal" value={f.price} onChange={(v) => setF({ ...f, price: v })} error={errors.price} />
+        <NativeSelect label="Цена" value={f.price_kind} onChange={(v) => setF({ ...f, price_kind: v as PriceKind })} options={[{ value: "exact", label: "Точная" }, { value: "from", label: "От суммы («от 1 500 ₽»)" }, { value: "on_request", label: "По договорённости" }]} />
+        {f.price_kind !== "on_request" && <NativeField label={f.price_kind === "from" ? `Цена от, ${tenant.currency}` : `Цена, ${tenant.currency}`} inputMode="decimal" value={f.price} onChange={(v) => setF({ ...f, price: v })} error={errors.price} />}
         <NativeField label="Длительность, мин" inputMode="numeric" value={f.duration_min} onChange={(v) => setF({ ...f, duration_min: v })} error={errors.duration_min} />
       </div>
       {tenant.profile.features.multi_day && <p className="muted" style={{ margin: 0, fontSize: 14 }}>Длительность идёт подряд, в том числе по нескольким дням: 2880 мин = 2 дня. {cap(vocab("resource_one"))} занят всё это время.</p>}
@@ -232,7 +234,7 @@ export function ServicesEditor() {
           {q.data.services.map((s) => (
             <button key={s.id} type="button" className="service-row" onClick={() => setTarget(s)} style={s.is_active ? undefined : { opacity: 0.5 }}>
               <span className="grow"><div className="service-name">{s.name}{s.is_active ? "" : " · скрыта"}</div><div className="service-desc">{formatDurationShort(s.duration_min)}{s.buffer_min ? ` · подготовка ${s.buffer_min} мин` : ""}{tenant.profile.features.choose_resource ? ` · ${s.offers.length} мастеров` : ""}</div></span>
-              <span className="price">{formatPrice(s.price_minor, tenant.currency)}</span>
+              <span className="price">{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</span>
               <PencilSimple size={18} aria-hidden />
             </button>
           ))}

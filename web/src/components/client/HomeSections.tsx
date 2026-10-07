@@ -28,7 +28,7 @@ function mapHref(tenant: Tenant) {
 
 /** Info tokens may use live values so they never go stale: {services}, {resources}, {min_price}. */
 function fillTokens(text: string, tenant: Tenant): string {
-  const prices = tenant.services.map((s) => s.price_minor);
+  const prices = tenant.services.filter((s) => s.price_kind !== "on_request").map((s) => s.price_minor);
   const counts: Record<string, number> = { services: tenant.services.length, resources: tenant.resources_count };
   const word = (n: number, forms: string[]) => {
     const n10 = n % 10, n100 = n % 100;
@@ -127,7 +127,7 @@ function ServiceList({ limit }: { limit: number }) {
           <li key={s.id}>
             <button type="button" disabled={!s.bookable} onClick={() => booking.open({ serviceId: s.id })}>
               <span className="grow"><b>{s.name}</b><small>{formatDurationShort(s.duration_min)}</small></span>
-              <span className="svc-price">{s.price_varies && s.price_minor ? "от " : ""}{formatPrice(s.price_minor, tenant.currency)}</span>
+              <span className="svc-price">{s.price_varies && s.price_minor && s.price_kind !== "from" ? "от " : ""}{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</span>
               <CaretRight size={18} aria-hidden />
             </button>
           </li>
@@ -257,7 +257,7 @@ export function ServicesPanel({ limit, withHeading = true }: { limit?: number; w
               <div className="name">{s.name}</div>
               <div className="meta">{s.duration_varies ? "" : ""}{formatDurationShort(s.duration_min)}{!withHeading && s.description ? ` — ${s.description}` : ""}</div>
             </span>
-            <span className="side"><div className="price">{s.price_varies && s.price_minor ? "от " : ""}{formatPrice(s.price_minor, tenant.currency)}</div>{withHeading && <div className="choose">Выбрать</div>}</span>
+            <span className="side"><div className="price">{s.price_varies && s.price_minor && s.price_kind !== "from" ? "от " : ""}{formatPrice(s.price_minor, tenant.currency, s.price_kind)}</div>{withHeading && <div className="choose">Выбрать</div>}</span>
             <ArrowUpRight size={22} aria-hidden />
           </button>
         ))}

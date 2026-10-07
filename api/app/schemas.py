@@ -103,6 +103,7 @@ class ServiceIn(Strict):
     name: str = Field(min_length=1, max_length=120)
     description: str = Field(default="", max_length=1000)
     price_minor: int = Field(ge=0, le=100_000_000)
+    price_kind: Literal["exact", "from", "on_request"] = "exact"
     duration_min: int = Field(gt=0, le=60 * 24 * 30)
     buffer_min: int = Field(default=0, ge=0, le=60 * 24)
     resource_ids: list[int] = []

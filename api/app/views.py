@@ -39,6 +39,7 @@ def public_tenant(db: Session, tenant, s: TenantSettings) -> dict:
             "name": v.name,
             "description": v.description,
             "price_minor": min(prices),
+            "price_kind": v.price_kind,
             "price_varies": min(prices) != max(prices),
             "duration_min": min(durations),
             "duration_varies": min(durations) != max(durations),
@@ -107,6 +108,11 @@ def public_tenant(db: Session, tenant, s: TenantSettings) -> dict:
     }
 
 
+def _price_kind(db: Session, b: Booking) -> str:
+    svc = db.get(Service, b.service_id)
+    return svc.price_kind if svc else "exact"
+
+
 def booking_client_view(db: Session, b: Booking, s: TenantSettings, now_min: int) -> dict:
     """What a client sees through their access token: their own booking only."""
     res = db.get(Resource, b.resource_id)
@@ -116,6 +122,7 @@ def booking_client_view(db: Session, b: Booking, s: TenantSettings, now_min: int
         "status": b.status,
         "service_name": b.service_name,
         "price_minor": b.price_minor,
+        "price_kind": _price_kind(db, b),
         "start_min": b.start_min,
         "end_min": b.end_min,
         "car": b.car,
@@ -137,6 +144,7 @@ def booking_owner_view(db: Session, b: Booking) -> dict:
         "service_id": b.service_id,
         "service_name": b.service_name,
         "price_minor": b.price_minor,
+        "price_kind": _price_kind(db, b),
         "start_min": b.start_min,
         "end_min": b.end_min,
         "buffer_min": b.buffer_min,

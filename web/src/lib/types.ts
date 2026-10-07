@@ -1,4 +1,6 @@
 export type Money = number; // minor units (kopecks/cents)
+/** how a price reads, as the studio states it: 1 500 ₽ | от 1 500 ₽ | по договорённости */
+export type PriceKind = "exact" | "from" | "on_request";
 
 export interface ServiceOffer {
   resource_id: number;
@@ -11,6 +13,7 @@ export interface ServicePublic {
   name: string;
   description: string;
   price_minor: Money; // lowest price among the resources that perform it
+  price_kind?: PriceKind;
   price_varies: boolean; // masters charge different prices -> show "from"
   duration_min: number;
   duration_varies: boolean;
@@ -117,6 +120,7 @@ export interface ClientBooking {
   status: BookingStatus;
   service_name: string;
   price_minor: Money;
+  price_kind?: PriceKind;
   start_min: number;
   end_min: number;
   car: string;
@@ -140,6 +144,7 @@ export interface OwnerBooking {
   service_id: number;
   service_name: string;
   price_minor: Money;
+  price_kind?: PriceKind;
   start_min: number;
   end_min: number;
   buffer_min: number;
@@ -201,6 +206,7 @@ export interface OwnerService {
   name: string;
   description: string;
   price_minor: Money;
+  price_kind?: PriceKind;
   duration_min: number;
   buffer_min: number;
   keywords: string[];

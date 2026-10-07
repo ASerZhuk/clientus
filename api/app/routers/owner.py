@@ -344,7 +344,7 @@ def _offer_rows(db, service_id: int) -> list[dict]:
 def _service_view(db, s: Service) -> dict:
     offers = _offer_rows(db, s.id)
     return {
-        "id": s.id, "name": s.name, "description": s.description, "price_minor": s.price_minor, "duration_min": s.duration_min,
+        "id": s.id, "name": s.name, "description": s.description, "price_minor": s.price_minor, "price_kind": s.price_kind, "duration_min": s.duration_min,
         "buffer_min": s.buffer_min, "keywords": s.keywords or [], "is_active": s.is_active,
         "resource_ids": [o["resource_id"] for o in offers], "offers": offers,
     }
@@ -399,7 +399,7 @@ def owner_service_create(body: ServiceIn, ctx: OwnerCtx = Depends(owner_dep)) ->
     with database.write_session(ctx.tenant.id) as db:
         sort = (db.scalar(select(func.max(Service.sort))) or 0) + 1
         svc = Service(
-            tenant_id=ctx.tenant.id, key=f"own-{secrets.token_hex(4)}", name=body.name, description=body.description, price_minor=body.price_minor,
+            tenant_id=ctx.tenant.id, key=f"own-{secrets.token_hex(4)}", name=body.name, description=body.description, price_minor=body.price_minor, price_kind=body.price_kind,
             duration_min=body.duration_min, buffer_min=body.buffer_min, keywords=body.keywords, is_active=body.is_active, sort=sort, owner_edited=True,
         )
         db.add(svc)
@@ -418,7 +418,7 @@ def owner_service_update(service_id: int, body: ServiceIn, ctx: OwnerCtx = Depen
         svc = db.get(Service, service_id)
         if not svc:
             raise HTTPException(404, {"code": "service_not_found"})
-        svc.name, svc.description, svc.price_minor = body.name, body.description, body.price_minor
+        svc.name, svc.description, svc.price_minor, svc.price_kind = body.name, body.description, body.price_minor, body.price_kind
         svc.duration_min, svc.buffer_min, svc.keywords, svc.is_active = body.duration_min, body.buffer_min, body.keywords, body.is_active
         svc.owner_edited = True
         if body.offers or body.resource_ids:
@@ -835,6 +835,7 @@ def _run_command(cmd: dict, ctx: OwnerCtx, currency: str, tz) -> dict:
             price, dur = _num(cmd.get("price")), _num(cmd.get("duration_min"))
             body = ServiceIn(
                 name=str(cmd.get("name") or cur["name"])[:120], description=cur["description"], buffer_min=cur["buffer_min"], keywords=cur["keywords"], is_active=True,
+                price_kind=cur["price_kind"] if price is None else "exact",
                 price_minor=round(price * 100) if price is not None else cur["price_minor"], duration_min=int(dur) if dur else cur["duration_min"],
             )
             v = owner_service_update(cur["id"], body, ctx)

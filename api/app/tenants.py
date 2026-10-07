@@ -88,7 +88,8 @@ class ServiceCfg(BaseModel):
     key: str = Field(pattern=r"^[a-z0-9-]{1,40}$")
     name: str = Field(min_length=1, max_length=120)
     description: str = ""
-    price: float = Field(ge=0)
+    price: float | None = Field(default=None, ge=0)  # null: "по договорённости"
+    price_from: bool = False  # the studio writes "от …"
     duration_min: int = Field(gt=0, le=60 * 24 * 30)
     buffer_min: int = Field(default=0, ge=0, le=60 * 24)
     resources: list[str | ServiceOfferCfg] | None = None
@@ -456,7 +457,8 @@ def _publish_services(db: Session, tid: int, cfg: BusinessConfig, force: bool, r
             report["kept_owner_edits"].append(f"service:{sc.key}")
             continue
         svc.name, svc.description = sc.name, sc.description
-        svc.price_minor = round(sc.price * 100)
+        svc.price_minor = round((sc.price or 0) * 100)
+        svc.price_kind = "on_request" if sc.price is None else "from" if sc.price_from else "exact"
         svc.duration_min, svc.buffer_min = sc.duration_min, sc.buffer_min
         svc.keywords, svc.sort, svc.is_active = list(sc.keywords), i, True
         if force:

@@ -78,7 +78,7 @@ export function BookingSheet({ bookingId, onClose }: { bookingId: number | null;
             <div><dt>Телефон</dt><dd><a href={telHref(b.client_phone)}>{formatPhone(b.client_phone)}</a></dd></div>
             {(b.car || tenant.profile.contact.car !== "hidden") && <div><dt>Автомобиль</dt><dd>{b.car || "—"}{b.plate ? ` · ${b.plate}` : ""}</dd></div>}
             {b.note && <div><dt>Комментарий</dt><dd>{b.note}</dd></div>}
-            <div><dt>Цена (на момент записи)</dt><dd>{formatPrice(b.price_minor, tenant.currency)}</dd></div>
+            <div><dt>Цена (на момент записи)</dt><dd>{formatPrice(b.price_minor, tenant.currency, b.price_kind)}</dd></div>
           </dl>
           {b.client_phone && <Button label="Позвонить клиенту" icon={<Phone weight="fill" />} href={telHref(b.client_phone)} variant="secondary" width="100%" />}
           {msg && <Banner status={msg.ok ? "success" : "error"} title={msg.text} />}
