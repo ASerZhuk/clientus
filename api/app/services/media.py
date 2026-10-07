@@ -97,8 +97,10 @@ def _font(size: int) -> ImageFont.ImageFont:
 
 
 def _mark(size: int, name: str, accent: str, logo: Image.Image | None, padding: float) -> Image.Image:
-    """Square icon: accent tile with the logo (or the first letter) centred."""
-    tile = Image.new("RGB", (size, size), _hex_rgb(accent))
+    """Square icon: the logo (or the first letter) centred on a tile. A logo with transparency (often light,
+    white or gold lettering) sits on a dark tile, since the brand colour may hide it."""
+    see_through = logo is not None and logo.mode == "RGBA" and logo.getchannel("A").getextrema()[0] < 250
+    tile = Image.new("RGB", (size, size), (17, 17, 17) if see_through else _hex_rgb(accent))
     inner = int(size * (1 - padding * 2))
     if logo is not None:
         mark = logo.copy()

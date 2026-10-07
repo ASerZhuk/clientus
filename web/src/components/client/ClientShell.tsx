@@ -1,6 +1,7 @@
 "use client";
 
 import { AppPrompt } from "@/components/AppPrompt";
+import { BrandLogo } from "@/components/BrandLogo";
 import { InAppBrowserBar } from "@/components/InAppBrowser";
 import { UserCircle } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -19,9 +20,7 @@ export function AppHeader() {
     <header className="app-header">
       <div className="app-header-inner">
         <Link href={href()} className="brand" aria-label={`${tenant.name}: на главную`}>
-          <span className="brand-logo">
-            {tenant.logo_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={tenant.logo_url} alt="" /> : tenant.name.slice(0, 1)}
-          </span>
+          <BrandLogo src={tenant.logo_url} name={tenant.name} />
           <span>{tenant.name}</span>
         </Link>
         <span className="grow" />

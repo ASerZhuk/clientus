@@ -12,6 +12,7 @@ import { AssistantSheet } from "@/components/client/AssistantSheet";
 import { AppPrompt, OwnerPushBanner } from "@/components/AppPrompt";
 import { isIos, isStandalone } from "@/lib/push";
 import { InAppBrowserBar } from "@/components/InAppBrowser";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useStudio } from "@/components/StudioProviders";
 import { Input } from "@/components/ui/Input";
 import { api, ApiError, ownerApi, setCsrf } from "@/lib/api";
@@ -32,7 +33,7 @@ export function OwnerHeader() {
     <header className="app-header">
       <div className="app-header-inner">
         <span className="brand">
-          <span className="brand-logo">{tenant.logo_url ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={tenant.logo_url} alt="" /> : tenant.name.slice(0, 1)}</span>
+          <BrandLogo src={tenant.logo_url} name={tenant.name} />
           <span className="brand-text"><small>Кабинет</small><span>{tenant.name}</span></span>
         </span>
         <span className="grow" />
