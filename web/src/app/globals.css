@@ -139,7 +139,7 @@
   .svc-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 22px 16px; text-align: left; background: transparent; border: 0; border-radius: 22px; color: inherit; font: inherit; cursor: pointer; text-decoration: none; }
   .svc-row:first-child, .svc-row:hover { background: var(--tile); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08); }
   .svc-row .name { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
-  .svc-row .grow { min-width: 0; } .svc-row .name { overflow-wrap: anywhere; hyphens: auto; } /* long single words (Автодиагностика) wrap instead of running under the price */
+  .svc-row .grow { min-width: 0; } .svc-row .name { overflow-wrap: anywhere; } /* long single words (Автодиагностика) wrap instead of running under the price */
   .svc-row .meta { margin-top: 8px; font-size: 17px; color: var(--muted); line-height: 1.4; }
   .svc-row .side { text-align: right; flex: none; }
   .svc-row .price { font-size: 20px; font-weight: 650; white-space: nowrap; }
