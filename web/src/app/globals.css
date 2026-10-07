@@ -142,7 +142,7 @@
   .svc-row .meta { margin-top: 8px; font-size: 17px; color: var(--muted); line-height: 1.4; }
   .svc-row .side { text-align: right; flex: none; }
   .svc-row .price { font-size: 20px; font-weight: 650; white-space: nowrap; }
-  .svc-row .price.on-request { white-space: normal; font-size: 15px; line-height: 1.25; max-width: 104px; } /* «По договорённости» wraps instead of covering the name */
+  .svc-row .price.on-request { white-space: normal; font-size: 15px; line-height: 1.25; max-width: 132px; } /* «По договорённости» wraps instead of covering the name */
   .svc-row .choose { margin-top: 8px; font-size: 17px; color: var(--muted); }
   .svc-row[aria-checked="true"] { background: color-mix(in srgb, var(--studio-accent, #4690ff) 16%, transparent); }
   .price { font-weight: 700; white-space: nowrap; }
