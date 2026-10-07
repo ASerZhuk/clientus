@@ -17,6 +17,15 @@ def media_url(rel: str | None) -> str | None:
     return f"/api/media/{rel}" if rel else None
 
 
+def _pwa_url(slug: str, name: str) -> str:
+    """Icon URL with its build time: a rebuilt icon gets a new URL, so phones don't keep the cached old one."""
+    rel = f"{slug}/pwa/{name}"
+    try:
+        return f"{media_url(rel)}?v={int(media.safe_path(rel).stat().st_mtime)}"
+    except Exception:
+        return media_url(rel)
+
+
 def hhmm(m: int) -> str:
     return f"{m // 60:02d}:{m % 60:02d}"
 
@@ -97,10 +106,10 @@ def public_tenant(db: Session, tenant, s: TenantSettings) -> dict:
             for g in db.scalars(select(GalleryPhoto).order_by(GalleryPhoto.sort, GalleryPhoto.id))
         ],
         "pwa": {
-            "icon192": media_url(f"{slug}/pwa/icon-192.png"),
-            "icon512": media_url(f"{slug}/pwa/icon-512.png"),
-            "maskable512": media_url(f"{slug}/pwa/maskable-512.png"),
-            "apple_touch": media_url(f"{slug}/pwa/apple-touch-icon.png"),
+            "icon192": _pwa_url(slug, "icon-192.png"),
+            "icon512": _pwa_url(slug, "icon-512.png"),
+            "maskable512": _pwa_url(slug, "maskable-512.png"),
+            "apple_touch": _pwa_url(slug, "apple-touch-icon.png"),
             "startup": [
                 {"url": media_url(f"{slug}/pwa/splash-{w}x{h}.png"), "dw": dw, "dh": dh, "ratio": ratio}
                 for (w, h, dw, dh, ratio) in media.SPLASH_SIZES

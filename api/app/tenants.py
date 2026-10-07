@@ -379,6 +379,8 @@ def publish(path: Path, *, activate: bool = False, force: bool = False, seed_dem
         settings.reminder_hours = cfg.booking.reminder_hours
         if "logo" in cfg.images and "logo" not in edited:
             settings.logo_path = _import_image(cfg.slug, root, cfg.images["logo"], kind="logo")
+        # a square emblem for the app icon when the logo is a wide wordmark (unreadable in a square tile)
+        icon_rel = _import_image(cfg.slug, root, cfg.images["icon"], kind="logo") if "icon" in cfg.images else None
         if "hero" in cfg.images and "hero" not in edited:
             settings.hero_path = _import_image(cfg.slug, root, cfg.images["hero"], kind="hero")
 
@@ -406,7 +408,7 @@ def publish(path: Path, *, activate: bool = False, force: bool = False, seed_dem
             purge_demo(db)
         report["status"] = tenant.status
 
-    media.build_pwa_assets(cfg.slug, settings_snapshot[0], settings_snapshot[1], settings_snapshot[2])
+    media.build_pwa_assets(cfg.slug, settings_snapshot[0], settings_snapshot[1], icon_rel or settings_snapshot[2])
     return report
 
 

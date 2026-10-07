@@ -10,7 +10,8 @@
   "accent": "#FF6B00",
   "images": {
     "logo": "logo.png",
-    "hero": "hero.jpg"
+    "hero": "hero.jpg",
+    "icon": "icon.png"
   },
   "gallery": [
     {
