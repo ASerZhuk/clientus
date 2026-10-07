@@ -10,3 +10,4 @@ test-results/
 playwright-report/
 .dev-tls/
 scripts/server.env
+STUDIOS.md
