@@ -1,0 +1,185 @@
+{
+  "business_type": "auto",
+  "slug": "tostation134",
+  "name": "to-station134",
+  "phone": "+7 927 069-03-39",
+  "address": "Волгоград, ул. Мачтозаводская, 1А",
+  "map_url": "https://yandex.ru/maps/?text=Волгоград, Мачтозаводская улица, 1А",
+  "timezone": "Europe/Volgograd",
+  "currency": "RUB",
+  "accent": "#F1A606",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": "Диагностика"
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": "Ремонт двигателя"
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": "Тормозная система"
+    },
+    {
+      "key": "work-4",
+      "image": "work-4.jpg",
+      "caption": "Ходовая часть"
+    },
+    {
+      "key": "work-5",
+      "image": "work-5.jpg",
+      "caption": "Выхлопная система"
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 60,
+    "max_advance_days": 45,
+    "cancel_before_hours": 2,
+    "reminder_hours": 24
+  },
+  "exceptions": [],
+  "tagline": "Ремонт авто в Волгограде. Диагностика и тех. осмотр",
+  "description": "Полный спектр услуг по ремонту автомобилей в Волгограде. Самым важным для нас всегда будет добиться результата, который хочет получить наш клиент. Постоянным клиентам дарим скидку на все виды услуг. Квалифицированные мастера, профессионалы своего дела. Ремонт любой сложности производится в кратчайшие сроки.",
+  "info_cards": [
+    {
+      "title": "{services}",
+      "text": "{services_word:услуга|услуги|услуг} в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "{resources}",
+      "text": "{resources_word:рабочее место|рабочих места|рабочих мест}",
+      "icon": "images"
+    },
+    {
+      "title": "от {min_price}",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "09:00",
+      "19:00"
+    ],
+    "tue": [
+      "09:00",
+      "19:00"
+    ],
+    "wed": [
+      "09:00",
+      "19:00"
+    ],
+    "thu": [
+      "09:00",
+      "19:00"
+    ],
+    "fri": [
+      "09:00",
+      "19:00"
+    ],
+    "sat": [
+      "09:00",
+      "19:00"
+    ],
+    "sun": null
+  },
+  "resources": [
+    {
+      "key": "main",
+      "name": "Мачтозаводская, 1А"
+    }
+  ],
+  "services": [
+    {
+      "key": "diag",
+      "name": "Диагностика",
+      "description": "Пройди бесплатную диагностику и получи скидку на все услуги.",
+      "price": 0,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "диагностика",
+        "осмотр",
+        "проверка"
+      ]
+    },
+    {
+      "key": "autodiag",
+      "name": "Автодиагностика",
+      "description": "",
+      "price": null,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "компьютерная диагностика",
+        "автодиагностика",
+        "ошибки",
+        "чек"
+      ]
+    },
+    {
+      "key": "engine",
+      "name": "Ремонт двигателя",
+      "description": "",
+      "price": null,
+      "duration_min": 120,
+      "buffer_min": 0,
+      "keywords": [
+        "двигатель",
+        "мотор",
+        "грм"
+      ]
+    },
+    {
+      "key": "brakes",
+      "name": "Тормозная система",
+      "description": "",
+      "price": null,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "тормоза",
+        "колодки",
+        "тормозные диски"
+      ]
+    },
+    {
+      "key": "chassis",
+      "name": "Ходовая часть",
+      "description": "",
+      "price": null,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "ходовая",
+        "подвеска",
+        "стук",
+        "амортизаторы"
+      ]
+    },
+    {
+      "key": "exhaust",
+      "name": "Выхлопная система",
+      "description": "",
+      "price": null,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "выхлоп",
+        "глушитель",
+        "катализатор"
+      ]
+    }
+  ],
+  "button_color": "#F1A606"
+}
