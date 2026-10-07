@@ -1,0 +1,154 @@
+{
+  "business_type": "auto",
+  "slug": "koleso134",
+  "name": "#КОЛЕСО134",
+  "phone": "+7 995 422-27-72",
+  "address": "Волгоград, Красноармейский р-н, ул. Лазоревая, 131",
+  "map_url": "https://yandex.ru/maps/?text=Волгоград, Лазоревая улица, 131",
+  "timezone": "Europe/Volgograd",
+  "currency": "RUB",
+  "accent": "#FF3434",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 60,
+    "max_advance_days": 45,
+    "cancel_before_hours": 2,
+    "reminder_hours": 24
+  },
+  "exceptions": [],
+  "tagline": "Профессиональный шиномонтаж",
+  "description": "Профессиональный шиномонтаж в Красноармейском районе Волгограда. Сезонная замена шин, подкачка, правка дисков, ремонт порезов. Также поиск и подбор шин под ваш бюджет — 2% от стоимости подобранного комплекта.",
+  "info_cards": [
+    {
+      "title": "{services}",
+      "text": "{services_word:услуга|услуги|услуг} в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "{resources}",
+      "text": "{resources_word:рабочее место|рабочих места|рабочих мест}",
+      "icon": "images"
+    },
+    {
+      "title": "от {min_price}",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "09:00",
+      "19:00"
+    ],
+    "tue": [
+      "09:00",
+      "19:00"
+    ],
+    "wed": [
+      "09:00",
+      "19:00"
+    ],
+    "thu": [
+      "09:00",
+      "19:00"
+    ],
+    "fri": [
+      "09:00",
+      "19:00"
+    ],
+    "sat": [
+      "09:00",
+      "19:00"
+    ],
+    "sun": [
+      "09:00",
+      "19:00"
+    ]
+  },
+  "resources": [
+    {
+      "key": "lazorevaya",
+      "name": "Лазоревая, 131"
+    }
+  ],
+  "services": [
+    {
+      "key": "season",
+      "name": "Сезонная замена шин",
+      "description": "",
+      "price": 800,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "переобувка",
+        "замена шин",
+        "смена колёс",
+        "смена колес",
+        "сезонная",
+        "шиномонтаж"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "pump",
+      "name": "Подкачка шин",
+      "description": "",
+      "price": 15,
+      "duration_min": 15,
+      "buffer_min": 0,
+      "keywords": [
+        "подкачка",
+        "подкачать",
+        "давление"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "disks",
+      "name": "Правка дисков",
+      "description": "",
+      "price": 500,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "правка",
+        "диск",
+        "диски"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "cuts",
+      "name": "Ремонт порезов",
+      "description": "",
+      "price": 1000,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "порез",
+        "ремонт пореза",
+        "вулканизация"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "tyre-search",
+      "name": "Поиск и подбор шин",
+      "description": "Учтём все ваши пожелания и подберём самый выгодный вариант по цене и качеству. Стоимость — 2% от стоимости комплекта подобранных шин. Владимир, 8 (995) 422-27-72.",
+      "price": null,
+      "duration_min": 30,
+      "buffer_min": 0,
+      "keywords": [
+        "подбор шин",
+        "поиск шин",
+        "купить шины"
+      ]
+    }
+  ],
+  "button_color": "#FF3434"
+}
