@@ -71,6 +71,7 @@ def public_tenant(db: Session, tenant, s: TenantSettings) -> dict:
         "timezone": s.timezone,
         "currency": s.currency,
         "accent": s.accent,
+        "button_color": s.button_color,
         "logo_url": media_url(s.logo_path),
         "hero_url": media_url(s.hero_path),
         "info_cards": s.info_cards or [],

@@ -128,6 +128,8 @@ class TenantSettings(TenantScoped, Base):
     timezone: Mapped[str] = mapped_column(String(64), default="Europe/Moscow")
     currency: Mapped[str] = mapped_column(String(8), default="RUB")
     accent: Mapped[str] = mapped_column(String(9), default="#4690FF")
+    # main buttons and selected chips in the studio's own colour (as on its website); null = the app's cream
+    button_color: Mapped[str | None] = mapped_column(String(9), nullable=True)
     logo_path: Mapped[str | None] = mapped_column(String(200))
     hero_path: Mapped[str | None] = mapped_column(String(200))
     info_cards: Mapped[list] = mapped_column(JSON, default=list)

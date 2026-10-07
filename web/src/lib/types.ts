@@ -86,6 +86,7 @@ export interface TenantPublic {
   timezone: string;
   currency: string;
   accent: string;
+  button_color?: string | null; // buttons as on the studio's website; null = the app's cream
   logo_url: string | null;
   hero_url: string | null;
   info_cards: InfoCard[];

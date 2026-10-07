@@ -43,7 +43,9 @@ export default async function StudioLayout({ children, params }: { children: Rea
   const base = await getBase(slug);
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `:root{--studio-accent:${tenant.accent};--studio-on-accent:${onAccent(tenant.accent)}}` }} />
+      <style dangerouslySetInnerHTML={{ __html: `:root{--studio-accent:${tenant.accent};--studio-on-accent:${onAccent(tenant.accent)}}`
+        // the studio's own button colour (as on its website) replaces the app's cream for buttons and selected chips
+        + (tenant.button_color && /^#[0-9a-f]{6}$/i.test(tenant.button_color) ? `.studio,.studio-owner,dialog,body{--cream:${tenant.button_color};--on-cream:${onAccent(tenant.button_color)}}` : "") }} />
       <StudioProviders tenant={tenant} base={base}>{children}</StudioProviders>
     </>
   );

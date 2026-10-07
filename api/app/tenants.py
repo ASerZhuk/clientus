@@ -145,6 +145,7 @@ class BusinessConfig(BaseModel):
     timezone: str = "Europe/Moscow"
     currency: str = "RUB"
     accent: str = "#4690FF"
+    button_color: str | None = None  # buttons as on the studio's website, e.g. "#25702A"
     images: dict[str, str] = {}
     info_cards: list[InfoCard] = []
     gallery: list[GalleryItem] = []
@@ -173,6 +174,13 @@ class BusinessConfig(BaseModel):
     def _plan(cls, v: str) -> str:
         if v not in plans.all_plans():
             raise ValueError(f"plan must be one of {', '.join(plans.all_plans())}")
+        return v
+
+    @field_validator("button_color")
+    @classmethod
+    def _button_color(cls, v: str | None) -> str | None:
+        if v is not None and not re.fullmatch(r"#[0-9A-Fa-f]{6}", v):
+            raise ValueError("button_color must be #RRGGBB")
         return v
 
     @field_validator("accent")
@@ -360,7 +368,7 @@ def publish(path: Path, *, activate: bool = False, force: bool = False, seed_dem
                 return
             setattr(settings, field, value)
 
-        for field in ("name", "tagline", "description", "phone", "address", "map_url", "accent", "info_cards"):
+        for field in ("name", "tagline", "description", "phone", "address", "map_url", "accent", "button_color", "info_cards"):
             value = getattr(cfg, field)
             guarded(field, [c.model_dump() for c in cfg.info_cards] if field == "info_cards" else value)
         settings.timezone, settings.currency, settings.business_type = cfg.timezone, cfg.currency, cfg.business_type
