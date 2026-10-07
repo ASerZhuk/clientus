@@ -522,8 +522,10 @@ def _seed_demo_bookings(db: Session, tenant: Tenant, settings: TenantSettings) -
         return
     tz = ZoneInfo(settings.timezone)
     today = datetime.now(tz).date()
-    samples = [("Демо-клиент А", "79990000001", -2, 10), ("Демо-клиент Б", "79990000002", 0, 11), ("Демо-клиент В", "79990000003", 1, 14)]
-    for i, (name, phone, offset, hour) in enumerate(samples):
+    # ordinary names: the prospect sees these rows in the cabinet; they are still marked is_demo and removed on activation
+    vehicle = profiles.get_profile(settings.business_type).kind == "vehicle"
+    samples = [("Сергей", "79990000001", -2, 10, "Toyota Camry"), ("Анна", "79990000002", 0, 11, "Kia Rio"), ("Дмитрий", "79990000003", 1, 14, "BMW X5")]
+    for i, (name, phone, offset, hour, car) in enumerate(samples):
         svc = services[i % len(services)]
         day = today + timedelta(days=offset)
         start = local_to_min(day, hour * 60, tz)
@@ -537,7 +539,7 @@ def _seed_demo_bookings(db: Session, tenant: Tenant, settings: TenantSettings) -
                 start_min=start,
                 name=name,
                 phone=phone,
-                car="Demo Car",
+                car=car if vehicle else "",
                 source="owner",
                 now_min=start - 24 * 60 if offset < 0 else now_min(),
                 outside_hours=True,
@@ -548,7 +550,8 @@ def _seed_demo_bookings(db: Session, tenant: Tenant, settings: TenantSettings) -
         db.query(Client).filter(Client.id == b.client_id).update({"is_demo": True})
         if offset < 0:
             b.status = "ready"
-            db.add(Payment(tenant_id=tenant.id, booking_id=b.id, kind="payment", amount_minor=b.price_minor, method="cash"))
+            if b.price_minor:  # a free visit (inspection) has nothing to pay
+                db.add(Payment(tenant_id=tenant.id, booking_id=b.id, kind="payment", amount_minor=b.price_minor, method="cash"))
     db.flush()
 
 
