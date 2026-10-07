@@ -1,0 +1,199 @@
+{
+  "business_type": "auto",
+  "slug": "polirovka34",
+  "name": "Полировка авто",
+  "phone": "+7 999 625-47-48",
+  "address": "Волгоград, Советский район, Авиаторская ул., 8",
+  "map_url": "https://yandex.ru/maps/?text=Волгоград, Авиаторская улица, 8",
+  "timezone": "Europe/Volgograd",
+  "currency": "RUB",
+  "accent": "#F2994A",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-4",
+      "image": "work-4.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-5",
+      "image": "work-5.jpg",
+      "caption": ""
+    }
+  ],
+  "booking": {
+    "slot_step_min": 60,
+    "lead_time_min": 120,
+    "max_advance_days": 45,
+    "cancel_before_hours": 12,
+    "reminder_hours": 24
+  },
+  "exceptions": [],
+  "tagline": "Звоните, пишите, индивидуально подберём оптимальное решение для Вашего автомобиля!",
+  "description": "Мы заботимся о том, чтобы Ваш автомобиль ежедневно радовал своим внешним видом.",
+  "info_cards": [
+    {
+      "title": "{services}",
+      "text": "{services_word:услуга|услуги|услуг} в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "{resources}",
+      "text": "{resources_word:рабочее место|рабочих места|рабочих мест}",
+      "icon": "images"
+    },
+    {
+      "title": "от {min_price}",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "09:00",
+      "19:00"
+    ],
+    "tue": [
+      "09:00",
+      "19:00"
+    ],
+    "wed": [
+      "09:00",
+      "19:00"
+    ],
+    "thu": [
+      "09:00",
+      "19:00"
+    ],
+    "fri": [
+      "09:00",
+      "19:00"
+    ],
+    "sat": [
+      "09:00",
+      "19:00"
+    ],
+    "sun": [
+      "09:00",
+      "19:00"
+    ]
+  },
+  "resources": [
+    {
+      "key": "aviatorskaya",
+      "name": "Авиаторская, 8"
+    }
+  ],
+  "services": [
+    {
+      "key": "abrasive",
+      "name": "Абразивная полировка кузова",
+      "description": "Хотите придать Вашему авто прекрасный внешний вид, или подготовить машину к продаже — полировка автомобиля оптимальный вариант.",
+      "price": 7000,
+      "duration_min": 360,
+      "buffer_min": 0,
+      "keywords": [
+        "абразивная",
+        "восстановительная",
+        "полировка кузова"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "polish",
+      "name": "Полировка",
+      "description": "Подберу подходящее решение под Ваши пожелания и бюджет!",
+      "price": 5000,
+      "duration_min": 300,
+      "buffer_min": 0,
+      "keywords": [
+        "полировка"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "headlights",
+      "name": "Полировка фар",
+      "description": "Потускнели фары? Прекрасный внешний вид и яркий свет — всего этого можно добиться при помощи полировки фар автомобиля!",
+      "price": 1500,
+      "duration_min": 120,
+      "buffer_min": 0,
+      "keywords": [
+        "фары",
+        "оптика",
+        "полировка фар"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "coating",
+      "name": "Нанесение защитного покрытия",
+      "description": "Защитим кузов Вашего автомобиля от внешних воздействий при помощи защитных покрытий. От наиболее бюджетных вариантов: воск карнаубы (Shine Systems, Detail), до более премиальных: керамика (CarPro, Krytex).",
+      "price": 4000,
+      "duration_min": 240,
+      "buffer_min": 0,
+      "keywords": [
+        "покрытие",
+        "керамика",
+        "воск"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "rain",
+      "name": "Нанесение антидождя + глубокая очистка стёкол",
+      "description": "Гидрофобное покрытие для стёкол, которое защищает их от дождя и грязи.",
+      "price": null,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "антидождь",
+        "стекла",
+        "стёкла"
+      ]
+    },
+    {
+      "key": "local",
+      "name": "Локальная полировка авто",
+      "description": "Оптимальное решение для последствий неудачной парковки или последствий мелких ДТП.",
+      "price": null,
+      "duration_min": 120,
+      "buffer_min": 0,
+      "keywords": [
+        "локальная",
+        "царапина",
+        "дтп"
+      ]
+    },
+    {
+      "key": "windshield",
+      "name": "Полировка лобового стекла",
+      "description": "Устали от бликов фар встречных автомобилей в ночное время суток? Тогда полировка лобового стекла — оптимальное решение для Вас!",
+      "price": null,
+      "duration_min": 120,
+      "buffer_min": 0,
+      "keywords": [
+        "лобовое",
+        "стекло"
+      ]
+    }
+  ]
+}
