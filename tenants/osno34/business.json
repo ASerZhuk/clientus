@@ -1,0 +1,378 @@
+{
+  "business_type": "auto",
+  "slug": "osno34",
+  "name": "Автосервис ОСНО",
+  "phone": "+7 906 404-69-69",
+  "address": "Волгоград, Дзержинский район, ш. Авиаторов, 11",
+  "map_url": "https://yandex.ru/maps/?text=Волгоград, шоссе Авиаторов, 11",
+  "timezone": "Europe/Volgograd",
+  "currency": "RUB",
+  "accent": "#FFFFFF",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-4",
+      "image": "work-4.jpg",
+      "caption": ""
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 60,
+    "max_advance_days": 45,
+    "cancel_before_hours": 2,
+    "reminder_hours": 24
+  },
+  "exceptions": [],
+  "tagline": "Фиксируем цену до начала ремонта. Фотоотчёт после работ. 1 год гарантии.",
+  "description": "✔️ Фиксируем цену до начала ремонта.\n✔️ Показываем, что сделали: фотоотчёт после работ.\n✔️ Поставка запчастей, демократичные цены.\n✔️ Предоставляем документы на ремонт.\n✔️ 1 год гарантии.\nБольше боксов — меньше ожидания. Удобная зона ожидания. Всё те же опытные мастера и проверенные технологии.",
+  "info_cards": [
+    {
+      "title": "{services}",
+      "text": "{services_word:услуга|услуги|услуг} в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "{resources}",
+      "text": "{resources_word:рабочее место|рабочих места|рабочих мест}",
+      "icon": "images"
+    },
+    {
+      "title": "от {min_price}",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "09:00",
+      "19:00"
+    ],
+    "tue": [
+      "09:00",
+      "19:00"
+    ],
+    "wed": [
+      "09:00",
+      "19:00"
+    ],
+    "thu": [
+      "09:00",
+      "19:00"
+    ],
+    "fri": [
+      "09:00",
+      "19:00"
+    ],
+    "sat": [
+      "09:00",
+      "19:00"
+    ],
+    "sun": [
+      "09:00",
+      "19:00"
+    ]
+  },
+  "resources": [
+    {
+      "key": "aviatorov",
+      "name": "Шоссе Авиаторов, 11"
+    }
+  ],
+  "services": [
+    {
+      "key": "to",
+      "name": "Техническое обслуживание автомобилей",
+      "description": "",
+      "price": 650,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "то",
+        "техобслуживание",
+        "обслуживание"
+      ]
+    },
+    {
+      "key": "diag",
+      "name": "Компьютерная диагностика автомобиля",
+      "description": "",
+      "price": 900,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "диагностика",
+        "компьютерная",
+        "ошибки",
+        "чек"
+      ]
+    },
+    {
+      "key": "chassis-diag",
+      "name": "Диагностика ходовой части",
+      "description": "",
+      "price": 1000,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "ходовая",
+        "подвеска",
+        "стук"
+      ]
+    },
+    {
+      "key": "endoscopy",
+      "name": "Эндоскопия двигателя",
+      "description": "",
+      "price": 1490,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "эндоскопия",
+        "цилиндры",
+        "двигатель"
+      ]
+    },
+    {
+      "key": "electric",
+      "name": "Автоэлектрик",
+      "description": "",
+      "price": 1190,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "электрика",
+        "электрик",
+        "проводка",
+        "стартер",
+        "генератор"
+      ]
+    },
+    {
+      "key": "oil-engine",
+      "name": "Замена масла в ДВС",
+      "description": "",
+      "price": 600,
+      "duration_min": 30,
+      "buffer_min": 0,
+      "keywords": [
+        "масло",
+        "замена масла",
+        "двигатель"
+      ]
+    },
+    {
+      "key": "oil-mt",
+      "name": "Замена масла в МКПП",
+      "description": "",
+      "price": 600,
+      "duration_min": 30,
+      "buffer_min": 0,
+      "keywords": [
+        "мкпп",
+        "механика",
+        "коробка"
+      ]
+    },
+    {
+      "key": "oil-dsg",
+      "name": "Замена масла в DSG VAG",
+      "description": "",
+      "price": 2190,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "dsg",
+        "робот",
+        "vag"
+      ]
+    },
+    {
+      "key": "atf",
+      "name": "Замена жидкости в АКПП",
+      "description": "",
+      "price": 1500,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "акпп",
+        "автомат",
+        "atf"
+      ]
+    },
+    {
+      "key": "coolant",
+      "name": "Замена охлаждающей жидкости",
+      "description": "",
+      "price": 1700,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "антифриз",
+        "тосол",
+        "охлаждающая"
+      ]
+    },
+    {
+      "key": "brake-fluid",
+      "name": "Замена тормозной жидкости",
+      "description": "",
+      "price": 1200,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "тормозная жидкость"
+      ]
+    },
+    {
+      "key": "pads",
+      "name": "Замена тормозных колодок",
+      "description": "",
+      "price": 700,
+      "duration_min": 30,
+      "buffer_min": 0,
+      "keywords": [
+        "колодки",
+        "тормоза"
+      ]
+    },
+    {
+      "key": "discs",
+      "name": "Замена тормозных дисков\\ось",
+      "description": "",
+      "price": 1500,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "тормозные диски",
+        "диски"
+      ]
+    },
+    {
+      "key": "disc-turn",
+      "name": "Проточка тормозных дисков",
+      "description": "",
+      "price": 1000,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "проточка"
+      ]
+    },
+    {
+      "key": "caliper",
+      "name": "Ремонт суппорта",
+      "description": "",
+      "price": 1500,
+      "duration_min": 90,
+      "buffer_min": 0,
+      "keywords": [
+        "суппорт"
+      ]
+    },
+    {
+      "key": "shocks",
+      "name": "Замена амортизаторов",
+      "description": "",
+      "price": 1500,
+      "duration_min": 90,
+      "buffer_min": 0,
+      "keywords": [
+        "амортизаторы",
+        "стойки"
+      ]
+    },
+    {
+      "key": "ball",
+      "name": "Замена шаровых опор",
+      "description": "",
+      "price": 600,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "шаровая",
+        "шаровые опоры"
+      ]
+    },
+    {
+      "key": "stab",
+      "name": "Замена стоек стабилизатора | ось",
+      "description": "",
+      "price": 800,
+      "duration_min": 30,
+      "buffer_min": 0,
+      "keywords": [
+        "стабилизатор",
+        "стойки стабилизатора"
+      ]
+    },
+    {
+      "key": "plugs",
+      "name": "Замена свечей зажигания (4 цилиндровый ДВС)",
+      "description": "",
+      "price": 800,
+      "duration_min": 30,
+      "buffer_min": 0,
+      "keywords": [
+        "свечи"
+      ]
+    },
+    {
+      "key": "injectors",
+      "name": "Промывка топливных форсунок",
+      "description": "",
+      "price": 3000,
+      "duration_min": 120,
+      "buffer_min": 0,
+      "keywords": [
+        "форсунки",
+        "промывка"
+      ]
+    },
+    {
+      "key": "timing",
+      "name": "Замена ремня ГРМ",
+      "description": "",
+      "price": 4000,
+      "duration_min": 240,
+      "buffer_min": 0,
+      "keywords": [
+        "грм",
+        "ремень"
+      ],
+      "price_from": true
+    },
+    {
+      "key": "ac",
+      "name": "Заправка автокондиционера",
+      "description": "",
+      "price": 1000,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "кондиционер",
+        "заправка",
+        "фреон"
+      ]
+    }
+  ],
+  "button_color": "#FFFFFF"
+}
