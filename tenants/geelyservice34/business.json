@@ -1,0 +1,227 @@
+{
+  "business_type": "auto",
+  "slug": "geelyservice34",
+  "name": "Geely-Belgee Service",
+  "phone": "+7 961 676-84-84",
+  "address": "Волгоград, Ворошиловский р-н, ул. Козловская, 34Г",
+  "map_url": "https://yandex.ru/maps/org/geely_belgee_service/68074559475",
+  "timezone": "Europe/Volgograd",
+  "currency": "RUB",
+  "accent": "#0A6DDB",
+  "images": {
+    "logo": "logo.png",
+    "hero": "hero.jpg"
+  },
+  "gallery": [
+    {
+      "key": "work-1",
+      "image": "work-1.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-2",
+      "image": "work-2.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-3",
+      "image": "work-3.jpg",
+      "caption": ""
+    },
+    {
+      "key": "work-4",
+      "image": "work-4.jpg",
+      "caption": ""
+    }
+  ],
+  "booking": {
+    "slot_step_min": 30,
+    "lead_time_min": 60,
+    "max_advance_days": 45,
+    "cancel_before_hours": 2,
+    "reminder_hours": 24
+  },
+  "exceptions": [],
+  "tagline": "Обслуживание и ремонт автомобилей Geely, Belgee, Knewstar, Lynk&Co, Zeekr, Volga в Волгограде",
+  "description": "Мы занимаемся ремонтом и обслуживанием автомобилей GEELY, BELGEE, KNEWSTAR, NORDCROSS, VOLGA, ZEEKR, LYNK&CO в Волгограде.",
+  "info_cards": [
+    {
+      "title": "{services}",
+      "text": "{services_word:услуга|услуги|услуг} в прайсе",
+      "icon": "wrench"
+    },
+    {
+      "title": "{resources}",
+      "text": "{resources_word:рабочее место|рабочих места|рабочих мест}",
+      "icon": "images"
+    },
+    {
+      "title": "от {min_price}",
+      "text": "за услугу",
+      "icon": "tag"
+    }
+  ],
+  "hours": {
+    "mon": [
+      "08:00",
+      "19:00"
+    ],
+    "tue": [
+      "08:00",
+      "19:00"
+    ],
+    "wed": [
+      "08:00",
+      "19:00"
+    ],
+    "thu": [
+      "08:00",
+      "19:00"
+    ],
+    "fri": [
+      "08:00",
+      "19:00"
+    ],
+    "sat": null,
+    "sun": null
+  },
+  "resources": [
+    {
+      "key": "kozlovskaya",
+      "name": "Козловская, 34Г"
+    }
+  ],
+  "services": [
+    {
+      "key": "to",
+      "name": "Замена масла в двигателе (ПЛАНОВОЕ ТО)",
+      "description": "",
+      "price": 1799,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "то",
+        "плановое то",
+        "масло",
+        "замена масла"
+      ]
+    },
+    {
+      "key": "robot",
+      "name": "Замена масла в роботизированной АКПП",
+      "description": "",
+      "price": 2999,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "робот",
+        "акпп",
+        "dct",
+        "коробка"
+      ]
+    },
+    {
+      "key": "pads-front",
+      "name": "Замена тормозных колодок (передняя ось)",
+      "description": "",
+      "price": 1799,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "колодки",
+        "тормоза",
+        "передние"
+      ]
+    },
+    {
+      "key": "pads-rear",
+      "name": "Замена тормозных колодок (задняя ось,эл.ручник)",
+      "description": "",
+      "price": 1999,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "колодки задние",
+        "электроручник",
+        "тормоза"
+      ]
+    },
+    {
+      "key": "plugs",
+      "name": "Замена свечей зажигания",
+      "description": "",
+      "price": 1299,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "свечи"
+      ]
+    },
+    {
+      "key": "alignment",
+      "name": "Развал-схождение 3Д",
+      "description": "",
+      "price": 1999,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "развал",
+        "схождение",
+        "сход-развал"
+      ]
+    },
+    {
+      "key": "tyres",
+      "name": "Шиномонтаж и хранение шин",
+      "description": "",
+      "price": 1999,
+      "duration_min": 60,
+      "buffer_min": 0,
+      "keywords": [
+        "шиномонтаж",
+        "переобувка",
+        "хранение шин",
+        "колёса"
+      ]
+    },
+    {
+      "key": "timing-15-3",
+      "name": "Замена комплекта ГРМ 1.5 (3 цилиндра)",
+      "description": "",
+      "price": 12500,
+      "duration_min": 300,
+      "buffer_min": 0,
+      "keywords": [
+        "грм",
+        "ремень",
+        "1.5"
+      ]
+    },
+    {
+      "key": "timing-15-4",
+      "name": "Замена цепи ГРМ 1.5 (4 циндра)",
+      "description": "",
+      "price": 17500,
+      "duration_min": 480,
+      "buffer_min": 0,
+      "keywords": [
+        "цепь грм",
+        "грм",
+        "1.5"
+      ]
+    },
+    {
+      "key": "timing-20",
+      "name": "Замена комплекта ГРМ 2.0",
+      "description": "",
+      "price": 13500,
+      "duration_min": 360,
+      "buffer_min": 0,
+      "keywords": [
+        "грм",
+        "2.0"
+      ]
+    }
+  ],
+  "button_color": "#0A6DDB"
+}
